@@ -333,13 +333,17 @@ function ecs_instance_credentials()
     new_creds = String(response.body)
     new_creds = JSON.parse(new_creds)
 
+    # SageMaker instance credentials returns a modified response from the meta data server
+    # Which normally does NOT include RoleArn
+    role_arn = haskey(new_creds, "RoleArn") ? new_creds["RoleArn"] : ""
+
     expiry = DateTime(rstrip(new_creds["Expiration"], 'Z'))
 
     return AWSCredentials(
         new_creds["AccessKeyId"],
         new_creds["SecretAccessKey"],
         new_creds["Token"],
-        new_creds["RoleArn"];
+        role_arn;
         expiry=expiry,
         renew=ecs_instance_credentials,
     )
