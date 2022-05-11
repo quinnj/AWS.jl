@@ -255,13 +255,23 @@ function _http_request(http_backend::HTTPBackend, request::Request, response_str
             # `Base.IOError` is needed because HTTP.jl can often have errors that aren't
             # caught and wrapped in an `HTTP.IOError`
             # https://github.com/JuliaWeb/HTTP.jl/issues/382
-            if isa(e, Sockets.DNSError) ||
-                isa(e, HTTP.ParseError) ||
-                isa(e, HTTP.IOError) ||
-                isa(e, Base.IOError) ||
-                (isa(e, HTTP.StatusError) && _http_status(e) >= 500)
+            errors = (Sockets.DNSError, HTTP.ParseError, HTTP.IOError, Base.IOError)
+            for error in errors
+                if isa(e, error)
+                    @debug "AWS.jl HTTP inner retry for $error" retry = true reason = "$error" exception =
+                        e
+                    return true
+                end
+            end
+            if (isa(e, HTTP.StatusError) && _http_status(e) >= 500)
+                @debug "AWS.jl HTTP inner retry for status >= 500" retry = true reason = "status >= 500" status = AWS._http_status(
+                    e
+                ) exception = e
                 return true
             end
+            @debug "AWS.jl HTTP inner retry declined" retry = false reason = "Exception passed onwards" exception =
+                e
+            return false
         end
 
     try
