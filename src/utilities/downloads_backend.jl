@@ -108,8 +108,20 @@ function _http_request(backend::DownloadsBackend, request::Request, response_str
 
     check =
         (s, e) -> begin
-            return (isa(e, HTTP.StatusError) && AWS._http_status(e) >= 500) ||
-                   isa(e, Downloads.RequestError)
+            if isa(e, HTTP.StatusError) && AWS._http_status(e) >= 500
+                @debug "AWS.jl Downloads inner retry for status >= 500" retry = true reason = "status >= 500" status = AWS._http_status(
+                    e
+                ) exception = e
+                return true
+            elseif isa(e, Downloads.RequestError)
+                @debug "AWS.jl Downloads inner retry for Downloads.RequestError" retry =
+                    true reason = "Downloads.RequestError" exception = e
+                return true
+            else
+                @debug "AWS.jl Downloads inner retry declined" retry = false reason = "Exception passed onwards" exception =
+                    e
+                return false
+            end
         end
 
     try
