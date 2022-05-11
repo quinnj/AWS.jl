@@ -153,7 +153,7 @@ function submit_request(aws::AbstractAWSConfig, request::Request; return_headers
             # Pass on non-AWS exceptions.
             if !(e isa AWSException)
                 @debug "AWS.jl declined to retry non-AWSException" retry = false reason = "Non-AWSException" exception =
-                e
+                    e
                 return false
             end
 
