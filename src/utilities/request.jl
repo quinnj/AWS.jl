@@ -136,13 +136,24 @@ function submit_request(aws::AbstractAWSConfig, request::Request; return_headers
             end
         end
 
-    check =
-        (s, e) -> begin
+    function upgrade_error(f)
+        () -> try
+            return f()
+        catch e
             if e isa HTTP.StatusError
                 e = AWSException(e, stream)
-            elseif !(e isa AWSException)
+                rethrow(e)
+            end
+            rethrow()
+        end
+    end
+
+    check =
+        (s, e) -> begin
+            # Pass on non-AWS exceptions.
+            if !(e isa AWSException)
                 @debug "AWS.jl declined to retry non-AWSException" retry = false reason = "Non-AWSException" exception =
-                    e
+                e
                 return false
             end
 
@@ -203,7 +214,7 @@ function submit_request(aws::AbstractAWSConfig, request::Request; return_headers
             return false
         end
 
-    retry(get_response; delays=Base.ExponentialBackOff(; n=3), check=check)
+    retry(upgrade_error(get_response); delays=Base.ExponentialBackOff(; n=2), check=check)()
 
     if request.use_response_type
         return aws_response
@@ -274,8 +285,12 @@ function _http_request(http_backend::HTTPBackend, request::Request, response_str
             return false
         end
 
+    get_response_with_retry = retry(
+        get_response; check=check, delays=Base.ExponentialBackOff(; n=3)
+    )
+
     try
-        retry(get_response; check=check, delays=Base.ExponentialBackOff(; n=4))
+        get_response_with_retry()
     finally
         # We're unable to read from the `Base.BufferStream` until it has been closed.
         # HTTP.jl will close passed in `response_stream` keyword. This ensures that it
