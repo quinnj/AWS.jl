@@ -241,6 +241,7 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"inputAttachments"`: List of input attachments for channel.
 - `"inputSpecification"`: Specification of network and file inputs for this channel
 - `"logLevel"`: The log level to write to CloudWatch Logs.
+- `"maintenance"`: Maintenance settings for this channel.
 - `"name"`: Name of channel.
 - `"requestId"`: Unique request ID to be specified. This is needed to prevent retries
   from
@@ -1778,6 +1779,7 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"inputAttachments"`:
 - `"inputSpecification"`: Specification of network and file inputs for this channel
 - `"logLevel"`: The log level to write to CloudWatch Logs.
+- `"maintenance"`: Maintenance settings for this channel.
 - `"name"`: The name of the channel.
 - `"roleArn"`: An optional Amazon Resource Name (ARN) of the role to assume when running
   the Channel. If you do not specify this on an update call but the role was previously set

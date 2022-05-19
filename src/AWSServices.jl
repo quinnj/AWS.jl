@@ -74,12 +74,18 @@ const backup_gateway = AWS.JSONService(
     "backup-gateway", "backup-gateway", "2021-01-01", "1.0", "BackupOnPremises_v20210101"
 )
 const batch = AWS.RestJSONService("batch", "batch", "2016-08-10")
+const billingconductor = AWS.RestJSONService(
+    "billingconductor", "billingconductor", "2021-07-30"
+)
 const braket = AWS.RestJSONService("braket", "braket", "2019-09-01")
 const budgets = AWS.JSONService(
     "budgets", "budgets", "2016-10-20", "1.1", "AWSBudgetServiceGateway"
 )
 const chime = AWS.RestJSONService("chime", "chime", "2018-05-01")
 const chime_sdk_identity = AWS.RestJSONService("chime", "identity-chime", "2021-04-20")
+const chime_sdk_media_pipelines = AWS.RestJSONService(
+    "chime", "media-pipelines-chime", "2021-07-15"
+)
 const chime_sdk_meetings = AWS.RestJSONService("chime", "meetings-chime", "2021-07-15")
 const chime_sdk_messaging = AWS.RestJSONService("chime", "messaging-chime", "2021-05-15")
 const cloud9 = AWS.JSONService(
@@ -275,6 +281,7 @@ const fsx = AWS.JSONService(
     "fsx", "fsx", "2018-03-01", "1.1", "AWSSimbaAPIService_v20180301"
 )
 const gamelift = AWS.JSONService("gamelift", "gamelift", "2015-10-01", "1.1", "GameLift")
+const gamesparks = AWS.RestJSONService("gamesparks", "gamesparks", "2021-08-17")
 const glacier = AWS.RestJSONService(
     "glacier", "glacier", "2012-06-01", LittleDict("x-amz-glacier-version" => "2012-06-01")
 )
@@ -315,7 +322,7 @@ const iot_1click_devices_service = AWS.RestJSONService(
 const iot_1click_projects = AWS.RestJSONService(
     "iot1click", "projects.iot1click", "2018-05-14"
 )
-const iot_data_plane = AWS.RestJSONService("iotdata", "data.iot", "2015-05-28")
+const iot_data_plane = AWS.RestJSONService("iotdata", "data-ats.iot", "2015-05-28")
 const iot_events = AWS.RestJSONService("iotevents", "iotevents", "2018-07-27")
 const iot_events_data = AWS.RestJSONService("ioteventsdata", "data.iotevents", "2018-10-23")
 const iot_jobs_data_plane = AWS.RestJSONService(
@@ -336,10 +343,14 @@ const iotthingsgraph = AWS.JSONService(
 )
 const iottwinmaker = AWS.RestJSONService("iottwinmaker", "iottwinmaker", "2021-11-29")
 const ivs = AWS.RestJSONService("ivs", "ivs", "2020-07-14")
+const ivschat = AWS.RestJSONService("ivschat", "ivschat", "2020-07-14")
 const kafka = AWS.RestJSONService("kafka", "kafka", "2018-11-14")
 const kafkaconnect = AWS.RestJSONService("kafkaconnect", "kafkaconnect", "2021-09-14")
 const kendra = AWS.JSONService(
     "kendra", "kendra", "2019-02-03", "1.1", "AWSKendraFrontendService"
+)
+const keyspaces = AWS.JSONService(
+    "cassandra", "cassandra", "2022-02-10", "1.0", "KeyspacesService"
 )
 const kinesis = AWS.JSONService(
     "kinesis", "kinesis", "2013-12-02", "1.1", "Kinesis_20131202"
@@ -482,6 +493,9 @@ const pinpoint = AWS.RestJSONService("mobiletargeting", "pinpoint", "2016-12-01"
 const pinpoint_email = AWS.RestJSONService("ses", "email", "2018-07-26")
 const pinpoint_sms_voice = AWS.RestJSONService(
     "sms-voice", "sms-voice.pinpoint", "2018-09-05"
+)
+const pinpoint_sms_voice_v2 = AWS.JSONService(
+    "sms-voice", "sms-voice", "2022-03-31", "1.0", "PinpointSMSVoiceV2"
 )
 const polly = AWS.RestJSONService("polly", "polly", "2016-06-10")
 const pricing = AWS.JSONService(

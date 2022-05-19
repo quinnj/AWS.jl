@@ -45,10 +45,10 @@ Attaches an SSL/TLS certificate to your Amazon Lightsail content delivery networ
 distribution. After the certificate is attached, your distribution accepts HTTPS traffic
 for all of the domains that are associated with the certificate. Use the CreateCertificate
 action to create a certificate that you can attach to your distribution.  Only certificates
-created in the us-east-1 AWS Region can be attached to Lightsail distributions. Lightsail
-distributions are global resources that can reference an origin in any AWS Region, and
-distribute its content globally. However, all distributions are located in the us-east-1
-Region.
+created in the us-east-1 Amazon Web Services Region can be attached to Lightsail
+distributions. Lightsail distributions are global resources that can reference an origin in
+any Amazon Web Services Region, and distribute its content globally. However, all
+distributions are located in the us-east-1 Region.
 
 # Arguments
 - `certificate_name`: The name of the certificate to attach to a distribution. Only
@@ -350,15 +350,16 @@ end
 
 Copies a manual snapshot of an instance or disk as another manual snapshot, or copies an
 automatic snapshot of an instance or disk as a manual snapshot. This operation can also be
-used to copy a manual or automatic snapshot of an instance or a disk from one AWS Region to
-another in Amazon Lightsail. When copying a manual snapshot, be sure to define the source
-region, source snapshot name, and target snapshot name parameters. When copying an
-automatic snapshot, be sure to define the source region, source resource name, target
-snapshot name, and either the restore date or the use latest restorable auto snapshot
-parameters.
+used to copy a manual or automatic snapshot of an instance or a disk from one Amazon Web
+Services Region to another in Amazon Lightsail. When copying a manual snapshot, be sure to
+define the source region, source snapshot name, and target snapshot name parameters. When
+copying an automatic snapshot, be sure to define the source region, source resource name,
+target snapshot name, and either the restore date or the use latest restorable auto
+snapshot parameters.
 
 # Arguments
-- `source_region`: The AWS Region where the source manual or automatic snapshot is located.
+- `source_region`: The Amazon Web Services Region where the source manual or automatic
+  snapshot is located.
 - `target_snapshot_name`: The name of the new manual snapshot to be created as a copy.
 
 # Optional Parameters
@@ -526,10 +527,11 @@ Creates an SSL/TLS certificate for an Amazon Lightsail content delivery network 
 distribution and a container service. After the certificate is valid, use the
 AttachCertificateToDistribution action to use the certificate and its domains with your
 distribution. Or use the UpdateContainerService action to use the certificate and its
-domains with your container service.  Only certificates created in the us-east-1 AWS Region
-can be attached to Lightsail distributions. Lightsail distributions are global resources
-that can reference an origin in any AWS Region, and distribute its content globally.
-However, all distributions are located in the us-east-1 Region.
+domains with your container service.  Only certificates created in the us-east-1 Amazon Web
+Services Region can be attached to Lightsail distributions. Lightsail distributions are
+global resources that can reference an origin in any Amazon Web Services Region, and
+distribute its content globally. However, all distributions are located in the us-east-1
+Region.
 
 # Arguments
 - `certificate_name`: The name for the certificate.
@@ -624,9 +626,10 @@ end
 
 Creates an email or SMS text message contact method. A contact method is used to send you
 notifications about your Amazon Lightsail resources. You can add one email address and one
-mobile phone number contact method in each AWS Region. However, SMS text messaging is not
-supported in some AWS Regions, and SMS text messages cannot be sent to some
-countries/regions. For more information, see Notifications in Amazon Lightsail.
+mobile phone number contact method in each Amazon Web Services Region. However, SMS text
+messaging is not supported in some Amazon Web Services Regions, and SMS text messages
+cannot be sent to some countries/regions. For more information, see Notifications in Amazon
+Lightsail.
 
 # Arguments
 - `contact_endpoint`: The destination of the contact method, such as an email address or a
@@ -636,13 +639,13 @@ countries/regions. For more information, see Notifications in Amazon Lightsail.
   the plus character (+) and the country code. For example, a U.S. phone number in E.164
   format would be specified as +1XXX5550100. For more information, see E.164 on Wikipedia.
 - `protocol`: The protocol of the contact method, such as Email or SMS (text messaging).
-  The SMS protocol is supported only in the following AWS Regions.   US East (N. Virginia)
-  (us-east-1)   US West (Oregon) (us-west-2)   Europe (Ireland) (eu-west-1)   Asia Pacific
-  (Tokyo) (ap-northeast-1)   Asia Pacific (Singapore) (ap-southeast-1)   Asia Pacific
-  (Sydney) (ap-southeast-2)   For a list of countries/regions where SMS text messages can be
-  sent, and the latest AWS Regions where SMS text messaging is supported, see Supported
-  Regions and Countries in the Amazon SNS Developer Guide. For more information about
-  notifications in Amazon Lightsail, see Notifications in Amazon Lightsail.
+  The SMS protocol is supported only in the following Amazon Web Services Regions.   US East
+  (N. Virginia) (us-east-1)   US West (Oregon) (us-west-2)   Europe (Ireland) (eu-west-1)
+  Asia Pacific (Tokyo) (ap-northeast-1)   Asia Pacific (Singapore) (ap-southeast-1)   Asia
+  Pacific (Sydney) (ap-southeast-2)   For a list of countries/regions where SMS text messages
+  can be sent, and the latest Amazon Web Services Regions where SMS text messaging is
+  supported, see Supported Regions and Countries in the Amazon SNS Developer Guide. For more
+  information about notifications in Amazon Lightsail, see Notifications in Amazon Lightsail.
 
 """
 function create_contact_method(
@@ -706,10 +709,10 @@ in Amazon Lightsail in the Lightsail Dev Guide.
   (Ohio) AWS region (us-east-2), then the domain for your container service will be like the
   following example:
   https://container-service-1.ur4EXAMPLE2uq.us-east-2.cs.amazonlightsail.com  The following
-  are the requirements for container service names:   Must be unique within each AWS Region
-  in your Lightsail account.   Must contain 1 to 63 characters.   Must contain only
-  alphanumeric characters and hyphens.   A hyphen (-) can separate words but cannot be at the
-  start or end of the name.
+  are the requirements for container service names:   Must be unique within each Amazon Web
+  Services Region in your Lightsail account.   Must contain 1 to 63 characters.   Must
+  contain only alphanumeric characters and hyphens.   A hyphen (-) can separate words but
+  cannot be at the start or end of the name.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -775,9 +778,9 @@ the ports to open, the environment variables to apply, and the launch command to
 also specifies the container that will serve as the public endpoint of the deployment and
 its settings, such as the HTTP or HTTPS port to use, and the health check configuration.
 You can deploy containers to your container service using container images from a public
-registry like Docker Hub, or from your local machine. For more information, see Creating
-container images for your Amazon Lightsail container services in the Amazon Lightsail
-Developer Guide.
+registry such as Amazon ECR Public, or from your local machine. For more information, see
+Creating container images for your Amazon Lightsail container services in the Amazon
+Lightsail Developer Guide.
 
 # Arguments
 - `service_name`: The name of the container service for which to create the deployment.
@@ -1086,8 +1089,8 @@ Content delivery networks in Amazon Lightsail.
   distribution.
 - `distribution_name`: The name for the distribution.
 - `origin`: An object that describes the origin resource for the distribution, such as a
-  Lightsail instance or load balancer. The distribution pulls, caches, and serves content
-  from the origin.
+  Lightsail instance, bucket, or load balancer. The distribution pulls, caches, and serves
+  content from the origin.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -1478,8 +1481,11 @@ end
     create_key_pair(key_pair_name)
     create_key_pair(key_pair_name, params::Dict{String,<:Any})
 
-Creates an SSH key pair. The create key pair operation supports tag-based access control
-via request tags. For more information, see the Amazon Lightsail Developer Guide.
+Creates a custom SSH key pair that you can use with an Amazon Lightsail instance.  Use the
+DownloadDefaultKeyPair action to create a Lightsail default key pair in an Amazon Web
+Services Region where a default key pair does not currently exist.  The create key pair
+operation supports tag-based access control via request tags. For more information, see the
+Amazon Lightsail Developer Guide.
 
 # Arguments
 - `key_pair_name`: The name for your new key pair.
@@ -1546,6 +1552,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   ipv4 for IPv4 only, and dualstack for IPv4 and IPv6. The default value is dualstack.
 - `"tags"`: The tag keys and optional values to add to the resource during create. Use the
   TagResource action to tag a resource after it's created.
+- `"tlsPolicyName"`: The name of the TLS policy to apply to the load balancer. Use the
+  GetLoadBalancerTlsPolicies action to get a list of TLS policy names that you can specify.
+  For more information about load balancer TLS policies, see Configuring TLS security
+  policies on your Amazon Lightsail load balancers in the Amazon Lightsail Developer Guide.
 """
 function create_load_balancer(
     instancePort, loadBalancerName; aws_config::AbstractAWSConfig=global_aws_config()
@@ -1992,7 +2002,8 @@ end
     delete_bucket(bucket_name, params::Dict{String,<:Any})
 
 Deletes a Amazon Lightsail bucket.  When you delete your bucket, the bucket name is
-released and can be reused for a new bucket in your account or another AWS account.
+released and can be reused for a new bucket in your account or another Amazon Web Services
+account.
 
 # Arguments
 - `bucket_name`: The name of the bucket to delete. Use the GetBuckets action to get a list
@@ -2122,9 +2133,9 @@ end
 
 Deletes a contact method. A contact method is used to send you notifications about your
 Amazon Lightsail resources. You can add one email address and one mobile phone number
-contact method in each AWS Region. However, SMS text messaging is not supported in some AWS
-Regions, and SMS text messages cannot be sent to some countries/regions. For more
-information, see Notifications in Amazon Lightsail.
+contact method in each Amazon Web Services Region. However, SMS text messaging is not
+supported in some Amazon Web Services Regions, and SMS text messages cannot be sent to some
+countries/regions. For more information, see Notifications in Amazon Lightsail.
 
 # Arguments
 - `protocol`: The protocol that will be deleted, such as Email or SMS (text messaging).  To
@@ -2511,13 +2522,22 @@ end
     delete_key_pair(key_pair_name)
     delete_key_pair(key_pair_name, params::Dict{String,<:Any})
 
-Deletes a specific SSH key pair. The delete key pair operation supports tag-based access
+Deletes the specified key pair by removing the public key from Amazon Lightsail. You can
+delete key pairs that were created using the ImportKeyPair and CreateKeyPair actions, as
+well as the Lightsail default key pair. A new default key pair will not be created unless
+you launch an instance without specifying a custom key pair, or you call the
+DownloadDefaultKeyPair API.  The delete key pair operation supports tag-based access
 control via resource tags applied to the resource identified by key pair name. For more
 information, see the Amazon Lightsail Developer Guide.
 
 # Arguments
 - `key_pair_name`: The name of the key pair to delete.
 
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"expectedFingerprint"`: The RSA fingerprint of the Lightsail default key pair to delete.
+   The expectedFingerprint parameter is required only when specifying to delete a Lightsail
+  default key pair.
 """
 function delete_key_pair(keyPairName; aws_config::AbstractAWSConfig=global_aws_config())
     return lightsail(
@@ -2987,7 +3007,9 @@ end
     download_default_key_pair()
     download_default_key_pair(params::Dict{String,<:Any})
 
-Downloads the default SSH key pair from the user's account.
+Downloads the regional Amazon Lightsail default key pair. This action also creates a
+Lightsail default key pair if a default key pair does not currently exist in the Amazon Web
+Services Region.
 
 """
 function download_default_key_pair(; aws_config::AbstractAWSConfig=global_aws_config())
@@ -3207,8 +3229,8 @@ due to operating system updates or new application releases.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"includeInactive"`: A Boolean value indicating whether to include inactive results in
-  your request.
+- `"includeInactive"`: A Boolean value that indicates whether to include inactive
+  (unavailable) blueprints in the response of your request.
 - `"pageToken"`: The token to advance to the next page of results from your request. To get
   a page token, perform an initial GetBlueprints request. If your results are paginated, the
   response will return a next page token that you can specify as the page token in a
@@ -3276,7 +3298,7 @@ UpdateBucketBundle action to update the bundle for a bucket.
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"includeInactive"`: A Boolean value that indicates whether to include inactive
-  (unavailable) bundles in the response.
+  (unavailable) bundles in the response of your request.
 """
 function get_bucket_bundles(; aws_config::AbstractAWSConfig=global_aws_config())
     return lightsail(
@@ -3395,13 +3417,16 @@ end
     get_buckets()
     get_buckets(params::Dict{String,<:Any})
 
-Returns information about one or more Amazon Lightsail buckets. For more information about
-buckets, see Buckets in Amazon Lightsail in the Amazon Lightsail Developer Guide..
+Returns information about one or more Amazon Lightsail buckets. The information returned
+includes the synchronization status of the Amazon Simple Storage Service (Amazon S3)
+account-level block public access feature for your Lightsail buckets. For more information
+about buckets, see Buckets in Amazon Lightsail in the Amazon Lightsail Developer Guide.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"bucketName"`: The name of the bucket for which to return information. When omitted, the
-  response includes all of your buckets in the AWS Region where the request is made.
+  response includes all of your buckets in the Amazon Web Services Region where the request
+  is made.
 - `"includeConnectedResources"`: A Boolean value that indicates whether to include
   Lightsail instances that were given access to the bucket using the
   SetResourceAccessForBucket action.
@@ -3425,13 +3450,15 @@ end
     get_bundles()
     get_bundles(params::Dict{String,<:Any})
 
-Returns the list of bundles that are available for purchase. A bundle describes the specs
-for your virtual private server (or instance).
+Returns the bundles that you can apply to an Amazon Lightsail instance when you create it.
+A bundle describes the specifications of an instance, such as the monthly cost, amount of
+memory, the number of vCPUs, amount of storage space, and monthly network data transfer
+quota.  Bundles are referred to as instance plans in the Lightsail console.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"includeInactive"`: A Boolean value that indicates whether to include inactive bundle
-  results in your request.
+- `"includeInactive"`: A Boolean value that indicates whether to include inactive
+  (unavailable) bundles in the response of your request.
 - `"pageToken"`: The token to advance to the next page of results from your request. To get
   a page token, perform an initial GetBundles request. If your results are paginated, the
   response will return a next page token that you can specify as the page token in a
@@ -3460,12 +3487,12 @@ name, and tags.
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"certificateName"`: The name for the certificate for which to return information. When
-  omitted, the response includes all of your certificates in the AWS Region where the request
-  is made.
+  omitted, the response includes all of your certificates in the Amazon Web Services Region
+  where the request is made.
 - `"certificateStatuses"`: The status of the certificates for which to return information.
   For example, specify ISSUED to return only certificates with an ISSUED status. When
-  omitted, the response includes all of your certificates in the AWS Region where the request
-  is made, regardless of their current status.
+  omitted, the response includes all of your certificates in the Amazon Web Services Region
+  where the request is made, regardless of their current status.
 - `"includeCertificateDetails"`: Indicates whether to include detailed information about
   the certificates in the response. When omitted, the response includes only the certificate
   names, Amazon Resource Names (ARNs), domain names, and tags.
@@ -3525,9 +3552,10 @@ end
 Returns information about the configured contact methods. Specify a protocol in your
 request to return information about a specific contact method. A contact method is used to
 send you notifications about your Amazon Lightsail resources. You can add one email address
-and one mobile phone number contact method in each AWS Region. However, SMS text messaging
-is not supported in some AWS Regions, and SMS text messages cannot be sent to some
-countries/regions. For more information, see Notifications in Amazon Lightsail.
+and one mobile phone number contact method in each Amazon Web Services Region. However, SMS
+text messaging is not supported in some Amazon Web Services Regions, and SMS text messages
+cannot be sent to some countries/regions. For more information, see Notifications in Amazon
+Lightsail.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -3849,8 +3877,8 @@ Returns information about one or more of your Amazon Lightsail container service
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"serviceName"`: The name of the container service for which to return information. When
-  omitted, the response includes all of your container services in the AWS Region where the
-  request is made.
+  omitted, the response includes all of your container services in the Amazon Web Services
+  Region where the request is made.
 """
 function get_container_services(; aws_config::AbstractAWSConfig=global_aws_config())
     return lightsail(
@@ -3994,7 +4022,7 @@ end
 
 Returns the bundles that can be applied to your Amazon Lightsail content delivery network
 (CDN) distributions. A distribution bundle specifies the monthly network transfer quota and
-monthly cost of your dsitribution.
+monthly cost of your distribution.
 
 """
 function get_distribution_bundles(; aws_config::AbstractAWSConfig=global_aws_config())
@@ -4174,8 +4202,8 @@ Returns information about one or more of your Amazon Lightsail content delivery 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"distributionName"`: The name of the distribution for which to return information. When
-  omitted, the response includes all of your distributions in the AWS Region where the
-  request is made.
+  omitted, the response includes all of your distributions in the Amazon Web Services Region
+  where the request is made.
 - `"pageToken"`: The token to advance to the next page of results from your request. To get
   a page token, perform an initial GetDistributions request. If your results are paginated,
   the response will return a next page token that you can specify as the page token in a
@@ -4694,6 +4722,8 @@ Returns information about all key pairs in the user's account.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"includeDefaultKeyPair"`: A Boolean value that indicates whether to include the default
+  key pair in the response of your request.
 - `"pageToken"`: The token to advance to the next page of results from your request. To get
   a page token, perform an initial GetKeyPairs request. If your results are paginated, the
   response will return a next page token that you can specify as the page token in a
@@ -4915,6 +4945,37 @@ function get_load_balancer_tls_certificates(
                 _merge, Dict{String,Any}("loadBalancerName" => loadBalancerName), params
             ),
         );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    get_load_balancer_tls_policies()
+    get_load_balancer_tls_policies(params::Dict{String,<:Any})
+
+Returns a list of TLS security policies that you can apply to Lightsail load balancers. For
+more information about load balancer TLS security policies, see Configuring TLS security
+policies on your Amazon Lightsail load balancers in the Amazon Lightsail Developer Guide.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"pageToken"`: The token to advance to the next page of results from your request. To get
+  a page token, perform an initial GetLoadBalancerTlsPolicies request. If your results are
+  paginated, the response will return a next page token that you can specify as the page
+  token in a subsequent request.
+"""
+function get_load_balancer_tls_policies(; aws_config::AbstractAWSConfig=global_aws_config())
+    return lightsail(
+        "GetLoadBalancerTlsPolicies"; aws_config=aws_config, feature_set=SERVICE_FEATURE_SET
+    )
+end
+function get_load_balancer_tls_policies(
+    params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return lightsail(
+        "GetLoadBalancerTlsPolicies",
+        params;
         aws_config=aws_config,
         feature_set=SERVICE_FEATURE_SET,
     )
@@ -5160,6 +5221,8 @@ with explicit performance specifications.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"includeInactive"`: A Boolean value that indicates whether to include inactive
+  (unavailable) bundles in the response of your request.
 - `"pageToken"`: The token to advance to the next page of results from your request. To get
   a page token, perform an initial GetRelationalDatabaseBundles request. If your results are
   paginated, the response will return a next page token that you can specify as the page
@@ -5886,9 +5949,9 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   (text messaging), or both. A notification is sent via the specified contact protocol if
   notifications are enabled for the alarm, and when the alarm is triggered. A notification is
   not sent if a contact protocol is not specified, if the specified contact protocol is not
-  configured in the AWS Region, or if notifications are not enabled for the alarm using the
-  notificationEnabled paramater. Use the CreateContactMethod action to configure a contact
-  protocol in an AWS Region.
+  configured in the Amazon Web Services Region, or if notifications are not enabled for the
+  alarm using the notificationEnabled paramater. Use the CreateContactMethod action to
+  configure a contact protocol in an Amazon Web Services Region.
 - `"datapointsToAlarm"`: The number of data points that must be not within the specified
   threshold to trigger the alarm. If you are setting an \"M out of N\" alarm, this value
   (datapointsToAlarm) is the M.
@@ -6225,13 +6288,13 @@ end
 Sends a verification request to an email contact method to ensure it's owned by the
 requester. SMS contact methods don't need to be verified. A contact method is used to send
 you notifications about your Amazon Lightsail resources. You can add one email address and
-one mobile phone number contact method in each AWS Region. However, SMS text messaging is
-not supported in some AWS Regions, and SMS text messages cannot be sent to some
-countries/regions. For more information, see Notifications in Amazon Lightsail. A
-verification request is sent to the contact method when you initially create it. Use this
-action to send another verification request if a previous verification request was deleted,
-or has expired.  Notifications are not sent to an email contact method until after it is
-verified, and confirmed as valid.
+one mobile phone number contact method in each Amazon Web Services Region. However, SMS
+text messaging is not supported in some Amazon Web Services Regions, and SMS text messages
+cannot be sent to some countries/regions. For more information, see Notifications in Amazon
+Lightsail. A verification request is sent to the contact method when you initially create
+it. Use this action to send another verification request if a previous verification request
+was deleted, or has expired.  Notifications are not sent to an email contact method until
+after it is verified, and confirmed as valid.
 
 # Arguments
 - `protocol`: The protocol to verify, such as Email or SMS (text messaging).
@@ -6276,8 +6339,8 @@ Alternately, you can use this action to disable dual-stack, and enable IPv4 only
 - `resource_name`: The name of the resource for which to set the IP address type.
 - `resource_type`: The resource type. The possible values are Distribution, Instance, and
   LoadBalancer.  Distribution-related APIs are available only in the N. Virginia (us-east-1)
-  AWS Region. Set your AWS Region configuration to us-east-1 to create, view, or edit
-  distributions.
+  Amazon Web Services Region. Set your Amazon Web Services Region configuration to us-east-1
+  to create, view, or edit distributions.
 
 """
 function set_ip_address_type(
@@ -6327,8 +6390,8 @@ end
     set_resource_access_for_bucket(access, bucket_name, resource_name, params::Dict{String,<:Any})
 
 Sets the Amazon Lightsail resources that can access the specified Lightsail bucket.
-Lightsail buckets currently support setting access for Lightsail instances in the same AWS
-Region.
+Lightsail buckets currently support setting access for Lightsail instances in the same
+Amazon Web Services Region.
 
 # Arguments
 - `access`: The access setting. The following access settings are available:    allow -
@@ -6714,8 +6777,8 @@ end
     update_bucket(bucket_name, params::Dict{String,<:Any})
 
 Updates an existing Amazon Lightsail bucket. Use this action to update the configuration of
-an existing bucket, such as versioning, public accessibility, and the AWS accounts that can
-access the bucket.
+an existing bucket, such as versioning, public accessibility, and the Amazon Web Services
+accounts that can access the bucket.
 
 # Arguments
 - `bucket_name`: The name of the bucket to update.
@@ -6725,8 +6788,9 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"accessLogConfig"`: An object that describes the access log configuration for the bucket.
 - `"accessRules"`: An object that sets the public accessibility of objects in the specified
   bucket.
-- `"readonlyAccessAccounts"`: An array of strings to specify the AWS account IDs that can
-  access the bucket. You can give a maximum of 10 AWS accounts access to a bucket.
+- `"readonlyAccessAccounts"`: An array of strings to specify the Amazon Web Services
+  account IDs that can access the bucket. You can give a maximum of 10 Amazon Web Services
+  accounts access to a bucket.
 - `"versioning"`: Specifies whether to enable or suspend versioning of objects in the
   bucket. The following options can be specified:    Enabled - Enables versioning of objects
   in the specified bucket.    Suspended - Suspends versioning of objects in the specified
@@ -6888,8 +6952,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   distribution.
 - `"isEnabled"`: Indicates whether to enable the distribution.
 - `"origin"`: An object that describes the origin resource for the distribution, such as a
-  Lightsail instance or load balancer. The distribution pulls, caches, and serves content
-  from the origin.
+  Lightsail instance, bucket, or load balancer. The distribution pulls, caches, and serves
+  content from the origin.
 """
 function update_distribution(
     distributionName; aws_config::AbstractAWSConfig=global_aws_config()
@@ -6924,7 +6988,7 @@ end
 
 Updates the bundle of your Amazon Lightsail content delivery network (CDN) distribution. A
 distribution bundle specifies the monthly network transfer quota and monthly cost of your
-dsitribution. Update your distribution's bundle if your distribution is going over its
+distribution. Update your distribution's bundle if your distribution is going over its
 monthly network transfer quota and is incurring an overage fee. You can update your
 distribution's bundle only one time within your monthly AWS billing cycle. To determine if
 you can update your distribution's bundle, use the GetDistributions action. The
@@ -7007,8 +7071,22 @@ resource tags applied to the resource identified by load balancer name. For more
 information, see the Amazon Lightsail Developer Guide.
 
 # Arguments
-- `attribute_name`: The name of the attribute you want to update. Valid values are below.
-- `attribute_value`: The value that you want to specify for the attribute name.
+- `attribute_name`: The name of the attribute you want to update.
+- `attribute_value`: The value that you want to specify for the attribute name. The
+  following values are supported depending on what you specify for the attributeName request
+  parameter:   If you specify HealthCheckPath for the attributeName request parameter, then
+  the attributeValue request parameter must be the path to ping on the target (for example,
+  /weather/us/wa/seattle).   If you specify SessionStickinessEnabled for the attributeName
+  request parameter, then the attributeValue request parameter must be true to activate
+  session stickiness or false to deactivate session stickiness.   If you specify
+  SessionStickiness_LB_CookieDurationSeconds for the attributeName request parameter, then
+  the attributeValue request parameter must be an interger that represents the cookie
+  duration in seconds.   If you specify HttpsRedirectionEnabled for the attributeName request
+  parameter, then the attributeValue request parameter must be true to activate HTTP to HTTPS
+  redirection or false to deactivate HTTP to HTTPS redirection.   If you specify
+  TlsPolicyName for the attributeName request parameter, then the attributeValue request
+  parameter must be the name of the TLS policy. Use the GetLoadBalancerTlsPolicies action to
+  get a list of TLS policy names that you can specify.
 - `load_balancer_name`: The name of the load balancer that you want to modify (e.g.,
   my-load-balancer.
 

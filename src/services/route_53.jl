@@ -53,7 +53,12 @@ a private hosted zone.   If you want to associate a VPC that was created by usin
 Amazon Web Services account with a private hosted zone that was created by using a
 different account, the Amazon Web Services account that created the private hosted zone
 must first submit a CreateVPCAssociationAuthorization request. Then the account that
-created the VPC must submit an AssociateVPCWithHostedZone request.
+created the VPC must submit an AssociateVPCWithHostedZone request.   When granting access,
+the hosted zone and the Amazon VPC must belong to the same partition. A partition is a
+group of Amazon Web Services Regions. Each Amazon Web Services account is scoped to one
+partition. The following are the supported partitions:    aws - Amazon Web Services Regions
+   aws-cn - China Regions    aws-us-gov - Amazon Web Services GovCloud (US) Region   For
+more information, see Access Management in the Amazon Web Services General Reference.
 
 # Arguments
 - `id`: The ID of the private hosted zone that you want to associate an Amazon VPC with.
@@ -121,8 +126,7 @@ For more information, see Using Traffic Flow to Route DNS Traffic in the Amazon 
 Developer Guide.  Create, Delete, and Upsert  Use ChangeResourceRecordsSetsRequest to
 perform the following actions:    CREATE: Creates a resource record set that has the
 specified values.    DELETE: Deletes an existing resource record set that has the specified
-values.    UPSERT: If a resource record set does not already exist, Amazon Web Services
-creates it. If a resource set does exist, Route 53 updates it with the values in the
+values.    UPSERT: If a resource set exists Route 53 updates it with the values in the
 request.     Syntaxes for Creating, Updating, and Deleting Resource Record Sets  The syntax
 for a request depends on the type of resource record set that you want to create, delete,
 or update, such as weighted, alias, or failover. The XML elements in your request must
@@ -317,7 +321,12 @@ Developer Guide.    When you submit a CreateHostedZone request, the initial stat
 hosted zone is PENDING. For public hosted zones, this means that the NS and SOA records are
 not yet available on all Route 53 DNS servers. When the NS and SOA records are available,
 the status of the zone changes to INSYNC. The CreateHostedZone request requires the caller
-to have an ec2:DescribeVpcs permission.
+to have an ec2:DescribeVpcs permission.  When creating private hosted zones, the Amazon VPC
+must belong to the same partition where the hosted zone is created. A partition is a group
+of Amazon Web Services Regions. Each Amazon Web Services account is scoped to one
+partition. The following are the supported partitions:    aws - Amazon Web Services Regions
+   aws-cn - China Regions    aws-us-gov - Amazon Web Services GovCloud (US) Region   For
+more information, see Access Management in the Amazon Web Services General Reference.
 
 # Arguments
 - `caller_reference`: A unique string that identifies the request and that allows failed
@@ -486,33 +495,42 @@ permissions that Route 53 needs to create log streams and to send query logs to 
 streams. For the value of Resource, specify the ARN for the log group that you created in
 the previous step. To use the same resource policy for all the CloudWatch Logs log groups
 that you created for query logging configurations, replace the hosted zone name with *, for
-example:  arn:aws:logs:us-east-1:123412341234:log-group:/aws/route53/*   You can't use the
-CloudWatch console to create or edit a resource policy. You must use the CloudWatch API,
-one of the Amazon Web Services SDKs, or the CLI.     Log Streams and Edge Locations  When
-Route 53 finishes creating the configuration for DNS query logging, it does the following:
- Creates a log stream for an edge location the first time that the edge location responds
-to DNS queries for the specified hosted zone. That log stream is used to log all queries
-that Route 53 responds to for that edge location.   Begins to send query logs to the
-applicable log stream.   The name of each log stream is in the following format:   hosted
-zone ID/edge location code   The edge location code is a three-letter code and an
-arbitrarily assigned number, for example, DFW3. The three-letter code typically corresponds
-with the International Air Transport Association airport code for an airport near the edge
-location. (These abbreviations might change in the future.) For a list of edge locations,
-see \"The Route 53 Global Network\" on the Route 53 Product Details page.  Queries That Are
-Logged  Query logs contain only the queries that DNS resolvers forward to Route 53. If a
-DNS resolver has already cached the response to a query (such as the IP address for a load
-balancer for example.com), the resolver will continue to return the cached response. It
-doesn't forward another query to Route 53 until the TTL for the corresponding resource
-record set expires. Depending on how many DNS queries are submitted for a resource record
-set, and depending on the TTL for that resource record set, query logs might contain
-information about only one query out of every several thousand queries that are submitted
-to DNS. For more information about how DNS works, see Routing Internet Traffic to Your
-Website or Web Application in the Amazon Route 53 Developer Guide.  Log File Format  For a
-list of the values in each query log and the format of each value, see Logging DNS Queries
-in the Amazon Route 53 Developer Guide.  Pricing  For information about charges for query
-logs, see Amazon CloudWatch Pricing.  How to Stop Logging  If you want Route 53 to stop
-sending query logs to CloudWatch Logs, delete the query logging configuration. For more
-information, see DeleteQueryLoggingConfig.
+example:  arn:aws:logs:us-east-1:123412341234:log-group:/aws/route53/*  To avoid the
+confused deputy problem, a security issue where an entity without a permission for an
+action can coerce a more-privileged entity to perform it, you can optionally limit the
+permissions that a service has to a resource in a resource-based policy by supplying the
+following values:   For aws:SourceArn, supply the hosted zone ARN used in creating the
+query logging configuration. For example, aws:SourceArn:
+arn:aws:route53:::hostedzone/hosted zone ID.   For aws:SourceAccount, supply the account ID
+for the account that creates the query logging configuration. For example,
+aws:SourceAccount:111111111111.   For more information, see The confused deputy problem in
+the Amazon Web Services IAM User Guide.  You can't use the CloudWatch console to create or
+edit a resource policy. You must use the CloudWatch API, one of the Amazon Web Services
+SDKs, or the CLI.     Log Streams and Edge Locations  When Route 53 finishes creating the
+configuration for DNS query logging, it does the following:   Creates a log stream for an
+edge location the first time that the edge location responds to DNS queries for the
+specified hosted zone. That log stream is used to log all queries that Route 53 responds to
+for that edge location.   Begins to send query logs to the applicable log stream.   The
+name of each log stream is in the following format:   hosted zone ID/edge location code
+The edge location code is a three-letter code and an arbitrarily assigned number, for
+example, DFW3. The three-letter code typically corresponds with the International Air
+Transport Association airport code for an airport near the edge location. (These
+abbreviations might change in the future.) For a list of edge locations, see \"The Route 53
+Global Network\" on the Route 53 Product Details page.  Queries That Are Logged  Query logs
+contain only the queries that DNS resolvers forward to Route 53. If a DNS resolver has
+already cached the response to a query (such as the IP address for a load balancer for
+example.com), the resolver will continue to return the cached response. It doesn't forward
+another query to Route 53 until the TTL for the corresponding resource record set expires.
+Depending on how many DNS queries are submitted for a resource record set, and depending on
+the TTL for that resource record set, query logs might contain information about only one
+query out of every several thousand queries that are submitted to DNS. For more information
+about how DNS works, see Routing Internet Traffic to Your Website or Web Application in the
+Amazon Route 53 Developer Guide.  Log File Format  For a list of the values in each query
+log and the format of each value, see Logging DNS Queries in the Amazon Route 53 Developer
+Guide.  Pricing  For information about charges for query logs, see Amazon CloudWatch
+Pricing.  How to Stop Logging  If you want Route 53 to stop sending query logs to
+CloudWatch Logs, delete the query logging configuration. For more information, see
+DeleteQueryLoggingConfig.
 
 # Arguments
 - `cloud_watch_logs_log_group_arn`: The Amazon Resource Name (ARN) for the log group that
@@ -1261,7 +1279,12 @@ account or using its own account. You can disassociate a VPC from a hosted zone 
 service created the hosted zone using your account. When you run
 DisassociateVPCFromHostedZone, if the hosted zone has a value for OwningAccount, you can
 use DisassociateVPCFromHostedZone. If the hosted zone has a value for OwningService, you
-can't use DisassociateVPCFromHostedZone.
+can't use DisassociateVPCFromHostedZone.    When revoking access, the hosted zone and the
+Amazon VPC must belong to the same partition. A partition is a group of Amazon Web Services
+Regions. Each Amazon Web Services account is scoped to one partition. The following are the
+supported partitions:    aws - Amazon Web Services Regions    aws-cn - China Regions
+aws-us-gov - Amazon Web Services GovCloud (US) Region   For more information, see Access
+Management in the Amazon Web Services General Reference.
 
 # Arguments
 - `id`: The ID of the private hosted zone that you want to disassociate a VPC from.
@@ -2178,7 +2201,13 @@ Services account or another Amazon Web Services account. Some services, such as 
 create hosted zones using the current account.    An OwningService element, which
 identifies the Amazon Web Services service that created and owns the hosted zone. For
 example, if a hosted zone was created by Amazon Elastic File System (Amazon EFS), the value
-of Owner is efs.amazonaws.com.
+of Owner is efs.amazonaws.com.     When listing private hosted zones, the hosted zone and
+the Amazon VPC must belong to the same partition where the hosted zones were created. A
+partition is a group of Amazon Web Services Regions. Each Amazon Web Services account is
+scoped to one partition. The following are the supported partitions:    aws - Amazon Web
+Services Regions    aws-cn - China Regions    aws-us-gov - Amazon Web Services GovCloud
+(US) Region   For more information, see Access Management in the Amazon Web Services
+General Reference.
 
 # Arguments
 - `vpcid`: The ID of the Amazon VPC that you want to list hosted zones for.

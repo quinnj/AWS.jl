@@ -636,6 +636,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   new instance. Specify a value between 600 and 360000.
 - `"Platform"`: The fleet platform. WINDOWS_SERVER_2019 and AMAZON_LINUX2 are supported for
   Elastic fleets.
+- `"SessionScriptS3Location"`: The S3 location of the session scripts configuration zip
+  file. This only applies to Elastic fleets.
 - `"StreamView"`: The AppStream 2.0 view that is displayed to your users when they stream
   from the fleet. When APP is specified, only the windows of applications opened by users
   display. When DESKTOP is specified, the standard desktop that is provided by the operating
@@ -2758,6 +2760,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"Name"`: A unique name for the fleet.
 - `"Platform"`: The platform of the fleet. WINDOWS_SERVER_2019 and AMAZON_LINUX2 are
   supported for Elastic fleets.
+- `"SessionScriptS3Location"`: The S3 location of the session scripts configuration zip
+  file. This only applies to Elastic fleets.
 - `"StreamView"`: The AppStream 2.0 view that is displayed to your users when they stream
   from the fleet. When APP is specified, only the windows of applications opened by users
   display. When DESKTOP is specified, the standard desktop that is provided by the operating

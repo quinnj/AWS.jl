@@ -48,13 +48,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
    In most cases, you can use this value instead of the session policy to lock down your user
   to the designated home directory (\"chroot\"). To do this, you can set Entry to / and set
   Target to the HomeDirectory parameter value. The following is an Entry and Target pair
-  example for chroot.  [ { \"Entry:\": \"/\", \"Target\": \"/bucket_name/home/mydirectory\" }
-  ]   If the target of a logical directory entry does not exist in Amazon S3 or EFS, the
-  entry is ignored. As a workaround, you can use the Amazon S3 API or EFS API to create 0
-  byte objects as place holders for your directory. If using the CLI, use the s3api or efsapi
-  call instead of s3 or efs so you can use the put-object operation. For example, you use the
-  following: aws s3api put-object --bucket bucketname --key path/to/folder/. Make sure that
-  the end of the key name ends in a / for it to be considered a folder.
+  example for chroot.  [ { \"Entry\": \"/\", \"Target\": \"/bucket_name/home/mydirectory\" }
+  ]
 - `"HomeDirectoryType"`: The type of landing directory (folder) you want your users' home
   directory to be when they log into the server. If you set it to PATH, the user will see the
   absolute Amazon S3 bucket or EFS paths as is in their file transfer protocol clients. If
@@ -179,11 +174,26 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   Identity and Access Management (IAM) role that allows a server to turn on Amazon CloudWatch
   logging for Amazon S3 or Amazon EFS events. When set, user activity can be viewed in your
   CloudWatch logs.
-- `"ProtocolDetails"`: The protocol settings that are configured for your server.  Use the
-  PassiveIp parameter to indicate passive mode (for FTP and FTPS protocols). Enter a single
-  dotted-quad IPv4 address, such as the external IP address of a firewall, router, or load
-  balancer.  Use the TlsSessionResumptionMode parameter to determine whether or not your
-  Transfer server resumes recent, negotiated sessions through a unique session ID.
+- `"PostAuthenticationLoginBanner"`: Specify a string to display when users connect to a
+  server. This string is displayed after the user authenticates.  The SFTP protocol does not
+  support post-authentication display banners.
+- `"PreAuthenticationLoginBanner"`: Specify a string to display when users connect to a
+  server. This string is displayed before the user authenticates. For example, the following
+  banner displays details about using the system.  This system is for the use of authorized
+  users only. Individuals using this computer system without authority, or in excess of their
+  authority, are subject to having all of their activities on this system monitored and
+  recorded by system personnel.
+- `"ProtocolDetails"`: The protocol settings that are configured for your server.    Use
+  the PassiveIp parameter to indicate passive mode (for FTP and FTPS protocols). Enter a
+  single dotted-quad IPv4 address, such as the external IP address of a firewall, router, or
+  load balancer.    Use the SetStatOption to ignore the error that is generated when the
+  client attempts to use SETSTAT on a file you are uploading to an S3 bucket. Set the value
+  to ENABLE_NO_OP to have the Transfer Family server ignore the SETSTAT command, and upload
+  files without needing to make any changes to your SFTP client. Note that with SetStatOption
+  set to ENABLE_NO_OP, Transfer generates a log entry to CloudWatch Logs, so you can
+  determine when the client is making a SETSTAT call.   Use the TlsSessionResumptionMode
+  parameter to determine whether or not your Transfer server resumes recent, negotiated
+  sessions through a unique session ID.
 - `"Protocols"`: Specifies the file transfer protocol or protocols over which your file
   transfer protocol client can connect to your server's endpoint. The available protocols
   are:    SFTP (Secure Shell (SSH) File Transfer Protocol): File transfer over SSH    FTPS
@@ -252,13 +262,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
    In most cases, you can use this value instead of the session policy to lock your user down
   to the designated home directory (\"chroot\"). To do this, you can set Entry to / and set
   Target to the HomeDirectory parameter value. The following is an Entry and Target pair
-  example for chroot.  [ { \"Entry:\": \"/\", \"Target\": \"/bucket_name/home/mydirectory\" }
-  ]   If the target of a logical directory entry does not exist in Amazon S3 or EFS, the
-  entry is ignored. As a workaround, you can use the Amazon S3 API or EFS API to create 0
-  byte objects as place holders for your directory. If using the CLI, use the s3api or efsapi
-  call instead of s3 or efs so you can use the put-object operation. For example, you use the
-  following: aws s3api put-object --bucket bucketname --key path/to/folder/. Make sure that
-  the end of the key name ends in a / for it to be considered a folder.
+  example for chroot.  [ { \"Entry\": \"/\", \"Target\": \"/bucket_name/home/mydirectory\" }
+  ]
 - `"HomeDirectoryType"`: The type of landing directory (folder) you want your users' home
   directory to be when they log into the server. If you set it to PATH, the user will see the
   absolute Amazon S3 bucket or EFS paths as is in their file transfer protocol clients. If
@@ -329,9 +334,9 @@ and UpdateServer operations.
 
 # Arguments
 - `steps`: Specifies the details for the steps that are in the specified workflow.  The
-  TYPE specifies which of the following actions is being taken for this step.     Copy: copy
-  the file to another location    Custom: custom step with a lambda target    Delete: delete
-  the file    Tag: add a tag to the file     Currently, copying and tagging are supported
+  TYPE specifies which of the following actions is being taken for this step.     COPY: copy
+  the file to another location    CUSTOM: custom step with a lambda target    DELETE: delete
+  the file    TAG: add a tag to the file     Currently, copying and tagging are supported
   only on S3.    For file location, you specify either the S3 bucket and key, or the EFS
   filesystem ID and path.
 
@@ -1439,13 +1444,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
    In most cases, you can use this value instead of the session policy to lock down your user
   to the designated home directory (\"chroot\"). To do this, you can set Entry to / and set
   Target to the HomeDirectory parameter value. The following is an Entry and Target pair
-  example for chroot.  [ { \"Entry:\": \"/\", \"Target\": \"/bucket_name/home/mydirectory\" }
-  ]   If the target of a logical directory entry does not exist in Amazon S3 or EFS, the
-  entry is ignored. As a workaround, you can use the Amazon S3 API or EFS API to create 0
-  byte objects as place holders for your directory. If using the CLI, use the s3api or efsapi
-  call instead of s3 or efs so you can use the put-object operation. For example, you use the
-  following: aws s3api put-object --bucket bucketname --key path/to/folder/. Make sure that
-  the end of the key name ends in a / for it to be considered a folder.
+  example for chroot.  [ { \"Entry\": \"/\", \"Target\": \"/bucket_name/home/mydirectory\" }
+  ]
 - `"HomeDirectoryType"`: The type of landing directory (folder) you want your users' home
   directory to be when they log into the server. If you set it to PATH, the user will see the
   absolute Amazon S3 bucket or EFS paths as is in their file transfer protocol clients. If
@@ -1553,11 +1553,26 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   Identity and Access Management (IAM) role that allows a server to turn on Amazon CloudWatch
   logging for Amazon S3 or Amazon EFS events. When set, user activity can be viewed in your
   CloudWatch logs.
-- `"ProtocolDetails"`:  The protocol settings that are configured for your server.   Use
+- `"PostAuthenticationLoginBanner"`: Specify a string to display when users connect to a
+  server. This string is displayed after the user authenticates.  The SFTP protocol does not
+  support post-authentication display banners.
+- `"PreAuthenticationLoginBanner"`: Specify a string to display when users connect to a
+  server. This string is displayed before the user authenticates. For example, the following
+  banner displays details about using the system.  This system is for the use of authorized
+  users only. Individuals using this computer system without authority, or in excess of their
+  authority, are subject to having all of their activities on this system monitored and
+  recorded by system personnel.
+- `"ProtocolDetails"`: The protocol settings that are configured for your server.    Use
   the PassiveIp parameter to indicate passive mode (for FTP and FTPS protocols). Enter a
   single dotted-quad IPv4 address, such as the external IP address of a firewall, router, or
-  load balancer.  Use the TlsSessionResumptionMode parameter to determine whether or not your
-  Transfer server resumes recent, negotiated sessions through a unique session ID.
+  load balancer.    Use the SetStatOption to ignore the error that is generated when the
+  client attempts to use SETSTAT on a file you are uploading to an S3 bucket. Set the value
+  to ENABLE_NO_OP to have the Transfer Family server ignore the SETSTAT command, and upload
+  files without needing to make any changes to your SFTP client. Note that with SetStatOption
+  set to ENABLE_NO_OP, Transfer generates a log entry to CloudWatch Logs, so you can
+  determine when the client is making a SETSTAT call.   Use the TlsSessionResumptionMode
+  parameter to determine whether or not your Transfer server resumes recent, negotiated
+  sessions through a unique session ID.
 - `"Protocols"`: Specifies the file transfer protocol or protocols over which your file
   transfer protocol client can connect to your server's endpoint. The available protocols
   are:   Secure Shell (SSH) File Transfer Protocol (SFTP): File transfer over SSH   File
@@ -1572,7 +1587,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"SecurityPolicyName"`: Specifies the name of the security policy that is attached to the
   server.
 - `"WorkflowDetails"`: Specifies the workflow ID for the workflow to assign and the
-  execution role used for executing the workflow.
+  execution role used for executing the workflow. To remove an associated workflow from a
+  server, you can provide an empty OnUpload object, as in the following example.  aws
+  transfer update-server --server-id s-01234567890abcdef --workflow-details
+  '{\"OnUpload\":[]}'
 """
 function update_server(ServerId; aws_config::AbstractAWSConfig=global_aws_config())
     return transfer(
@@ -1629,13 +1647,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
    In most cases, you can use this value instead of the session policy to lock down your user
   to the designated home directory (\"chroot\"). To do this, you can set Entry to '/' and set
   Target to the HomeDirectory parameter value. The following is an Entry and Target pair
-  example for chroot.  [ { \"Entry:\": \"/\", \"Target\": \"/bucket_name/home/mydirectory\" }
-  ]   If the target of a logical directory entry does not exist in Amazon S3 or EFS, the
-  entry is ignored. As a workaround, you can use the Amazon S3 API or EFS API to create 0
-  byte objects as place holders for your directory. If using the CLI, use the s3api or efsapi
-  call instead of s3 or efs so you can use the put-object operation. For example, you use the
-  following: aws s3api put-object --bucket bucketname --key path/to/folder/. Make sure that
-  the end of the key name ends in a / for it to be considered a folder.
+  example for chroot.  [ { \"Entry\": \"/\", \"Target\": \"/bucket_name/home/mydirectory\" }
+  ]
 - `"HomeDirectoryType"`: The type of landing directory (folder) you want your users' home
   directory to be when they log into the server. If you set it to PATH, the user will see the
   absolute Amazon S3 bucket or EFS paths as is in their file transfer protocol clients. If

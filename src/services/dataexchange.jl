@@ -719,6 +719,53 @@ function list_tags_for_resource(
 end
 
 """
+    revoke_revision(data_set_id, revision_id, revocation_comment)
+    revoke_revision(data_set_id, revision_id, revocation_comment, params::Dict{String,<:Any})
+
+This operation revokes subscribers' access to a revision.
+
+# Arguments
+- `data_set_id`: The unique identifier for a data set.
+- `revision_id`: The unique identifier for a revision.
+- `revocation_comment`: A required comment to inform subscribers of the reason their access
+  to the revision was revoked.
+
+"""
+function revoke_revision(
+    DataSetId,
+    RevisionId,
+    RevocationComment;
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return dataexchange(
+        "POST",
+        "/v1/data-sets/$(DataSetId)/revisions/$(RevisionId)/revoke",
+        Dict{String,Any}("RevocationComment" => RevocationComment);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function revoke_revision(
+    DataSetId,
+    RevisionId,
+    RevocationComment,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return dataexchange(
+        "POST",
+        "/v1/data-sets/$(DataSetId)/revisions/$(RevisionId)/revoke",
+        Dict{String,Any}(
+            mergewith(
+                _merge, Dict{String,Any}("RevocationComment" => RevocationComment), params
+            ),
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     send_api_asset(x-amzn-dataexchange-asset-id, x-amzn-dataexchange-data-set-id, x-amzn-dataexchange-revision-id)
     send_api_asset(x-amzn-dataexchange-asset-id, x-amzn-dataexchange-data-set-id, x-amzn-dataexchange-revision-id, params::Dict{String,<:Any})
 

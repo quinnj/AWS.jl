@@ -99,10 +99,11 @@ SDK, see Using the Amazon Chime SDK in the Amazon Chime Developer Guide.
 - `client_request_token`: The unique identifier for the client request. Use a different
   token for different meetings.
 - `external_meeting_id`: The external meeting ID.
-- `media_region`: The Region in which to create the meeting.  Available values: af-south-1
-  , ap-northeast-1 , ap-northeast-2 , ap-south-1 , ap-southeast-1 , ap-southeast-2 ,
-  ca-central-1 , eu-central-1 , eu-north-1 , eu-south-1 , eu-west-1 , eu-west-2 , eu-west-3 ,
-  sa-east-1 , us-east-1 , us-east-2 , us-west-1 , us-west-2 .
+- `media_region`: The Region in which to create the meeting.  Available values: af-south-1,
+  ap-northeast-1, ap-northeast-2, ap-south-1, ap-southeast-1, ap-southeast-2, ca-central-1,
+  eu-central-1, eu-north-1, eu-south-1, eu-west-1, eu-west-2, eu-west-3, sa-east-1,
+  us-east-1, us-east-2, us-west-1, us-west-2.  Available values in AWS GovCloud (US) Regions:
+  us-gov-east-1, us-gov-west-1.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -111,6 +112,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"MeetingHostId"`: Reserved.
 - `"NotificationsConfiguration"`: The configuration for resource targets to receive
   notifications when meeting and attendee events occur.
+- `"PrimaryMeetingId"`: When specified, replicates the media from the primary meeting to
+  the new meeting.
 """
 function create_meeting(
     ClientRequestToken,
@@ -170,7 +173,11 @@ the Amazon Chime SDK in the Amazon Chime Developer Guide.
 - `client_request_token`: The unique identifier for the client request. Use a different
   token for different meetings.
 - `external_meeting_id`: The external meeting ID.
-- `media_region`: The Region in which to create the meeting.
+- `media_region`: The Region in which to create the meeting.  Available values: af-south-1,
+  ap-northeast-1, ap-northeast-2, ap-south-1, ap-southeast-1, ap-southeast-2, ca-central-1,
+  eu-central-1, eu-north-1, eu-south-1, eu-west-1, eu-west-2, eu-west-3, sa-east-1,
+  us-east-1, us-east-2, us-west-1, us-west-2.  Available values in AWS GovCloud (US) Regions:
+  us-gov-east-1, us-gov-west-1.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -179,6 +186,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"MeetingHostId"`: Reserved.
 - `"NotificationsConfiguration"`: The configuration for resource targets to receive
   notifications when meeting and attendee events occur.
+- `"PrimaryMeetingId"`: When specified, replicates the media from the primary meeting to
+  the new meeting.
 """
 function create_meeting_with_attendees(
     Attendees,

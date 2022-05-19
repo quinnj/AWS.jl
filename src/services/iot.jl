@@ -899,15 +899,17 @@ Requires permission to access the CreateCustomMetric action.
   exception occurs. If you omit this value, Amazon Web Services SDKs will automatically
   generate a unique client request.
 - `metric_name`:  The name of the custom metric. This will be used in the metric report
-  submitted from the device/thing. Shouldn't begin with aws:. Cannot be updated once defined.
-- `metric_type`:  The type of the custom metric. Types include string-list,
-  ip-address-list, number-list, and number.
+  submitted from the device/thing. The name can't begin with aws:. You can't change the name
+  after you define it.
+- `metric_type`:  The type of the custom metric.   The type number only takes a single
+  metric value as an input, but when you submit the metrics value in the DeviceMetrics
+  report, you must pass it as an array with a single value.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"displayName"`:  Field represents a friendly name in the console for the custom metric;
-  it doesn't have to be unique. Don't use this name as the metric identifier in the device
-  metric report. Can be updated once defined.
+- `"displayName"`:  The friendly name in the console for the custom metric. This name
+  doesn't have to be unique. Don't use this name as the metric identifier in the device
+  metric report. You can update the friendly name after you define it.
 - `"tags"`:  Metadata that can be used to manage the custom metric.
 """
 function create_custom_metric(
@@ -1211,8 +1213,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"abortConfig"`: Allows you to create the criteria to abort a job.
 - `"description"`: A short text description of the job.
 - `"document"`: The job document. Required if you don't specify a value for documentSource.
-- `"documentParameters"`: Parameters of a managed template that you can specify to create
-  the job document.
+- `"documentParameters"`: Parameters of an Amazon Web Services managed template that you
+  can specify to create the job document.   documentParameters can only be used when creating
+  jobs from Amazon Web Services managed templates. This parameter can't be used with custom
+  job templates or to create jobs from them.
 - `"documentSource"`: An S3 link to the job document. Required if you don't specify a value
   for document.  If the job document resides in an S3 bucket, you must use a placeholder link
   when specifying the document. The placeholder link is of the following form:
@@ -1232,7 +1236,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   be complete after all those things specified as targets have completed the job (SNAPSHOT).
   If continuous, the job may also be run on a thing when a change is detected in a target.
   For example, a job will run on a thing when the thing is added to a target group, even
-  after the job was completed by all things originally in the group.
+  after the job was completed by all things originally in the group.  We recommend that you
+  use continuous jobs instead of snapshot jobs for dynamic thing group targets. By using
+  continuous jobs, devices that join the group receive the job execution even after the job
+  has been created.
 - `"timeoutConfig"`: Specifies the amount of time each device has to finish its execution
   of the job. The timer is started when the job execution status is set to IN_PROGRESS. If
   the job execution status is not set to another terminal state before the time expires, it
@@ -1735,7 +1742,8 @@ Creates a role alias. Requires permission to access the CreateRoleAlias action.
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"credentialDurationSeconds"`: How long (in seconds) the credentials will be valid. The
-  default value is 3,600 seconds.
+  default value is 3,600 seconds. This value must be less than or equal to the maximum
+  session duration of the IAM role that the role alias references.
 - `"tags"`: Metadata which can be used to manage the role alias.  For URI Request
   parameters use format: ...key1=value1&amp;key2=value2... For the CLI command-line parameter
   use format: &amp;&amp;tags \"key1=value1&amp;key2=value2...\" For the cli-input-json file
@@ -6114,7 +6122,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   be complete after all those things specified as targets have completed the job (SNAPSHOT).
   If continuous, the job may also be run on a thing when a change is detected in a target.
   For example, a job will run on a thing when the thing is added to a target group, even
-  after the job was completed by all things originally in the group.
+  after the job was completed by all things originally in the group.   We recommend that you
+  use continuous jobs instead of snapshot jobs for dynamic thing group targets. By using
+  continuous jobs, devices that join the group receive the job execution even after the job
+  has been created.
 - `"thingGroupId"`: A filter that limits the returned jobs to those for the specified group.
 - `"thingGroupName"`: A filter that limits the returned jobs to those for the specified
   group.
@@ -6159,6 +6170,74 @@ function list_managed_job_templates(
         "GET",
         "/managed-job-templates",
         params;
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    list_metric_values(end_time, metric_name, start_time, thing_name)
+    list_metric_values(end_time, metric_name, start_time, thing_name, params::Dict{String,<:Any})
+
+Lists the values reported for an IoT Device Defender metric (device-side metric, cloud-side
+metric, or custom metric) by the given thing during the specified time period.
+
+# Arguments
+- `end_time`: The end of the time period for which metric values are returned.
+- `metric_name`: The name of the security profile metric for which values are returned.
+- `start_time`: The start of the time period for which metric values are returned.
+- `thing_name`: The name of the thing for which security profile metric values are returned.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"dimensionName"`: The dimension name.
+- `"dimensionValueOperator"`: The dimension value operator.
+- `"maxResults"`: The maximum number of results to return at one time.
+- `"nextToken"`: The token for the next set of results.
+"""
+function list_metric_values(
+    endTime,
+    metricName,
+    startTime,
+    thingName;
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return iot(
+        "GET",
+        "/metric-values",
+        Dict{String,Any}(
+            "endTime" => endTime,
+            "metricName" => metricName,
+            "startTime" => startTime,
+            "thingName" => thingName,
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function list_metric_values(
+    endTime,
+    metricName,
+    startTime,
+    thingName,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return iot(
+        "GET",
+        "/metric-values",
+        Dict{String,Any}(
+            mergewith(
+                _merge,
+                Dict{String,Any}(
+                    "endTime" => endTime,
+                    "metricName" => metricName,
+                    "startTime" => startTime,
+                    "thingName" => thingName,
+                ),
+                params,
+            ),
+        );
         aws_config=aws_config,
         feature_set=SERVICE_FEATURE_SET,
     )
@@ -7383,6 +7462,7 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   device certificates.
 - `"registrationConfig"`: Information about the registration configuration.
 - `"setAsActive"`: A boolean value that specifies if the CA certificate is set to active.
+  Valid values: ACTIVE | INACTIVE
 - `"tags"`: Metadata which can be used to manage the CA certificate.  For URI Request
   parameters use format: ...key1=value1&amp;key2=value2... For the CLI command-line parameter
   use format: &amp;&amp;tags \"key1=value1&amp;key2=value2...\" For the cli-input-json file
@@ -7445,7 +7525,9 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"caCertificatePem"`: The CA certificate used to sign the device certificate being
   registered.
 - `"setAsActive"`: A boolean value that specifies if the certificate is set to active.
-- `"status"`: The status of the register certificate request.
+  Valid values: ACTIVE | INACTIVE
+- `"status"`: The status of the register certificate request. Valid values that you can use
+  include ACTIVE, INACTIVE, and REVOKED.
 """
 function register_certificate(
     certificatePem; aws_config::AbstractAWSConfig=global_aws_config()
@@ -9176,7 +9258,9 @@ Updates a role alias. Requires permission to access the UpdateRoleAlias action.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"credentialDurationSeconds"`: The number of seconds the credential will be valid.
+- `"credentialDurationSeconds"`: The number of seconds the credential will be valid. This
+  value must be less than or equal to the maximum session duration of the IAM role that the
+  role alias references.
 - `"roleArn"`: The role ARN.
 """
 function update_role_alias(roleAlias; aws_config::AbstractAWSConfig=global_aws_config())

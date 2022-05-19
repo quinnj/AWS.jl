@@ -2479,7 +2479,9 @@ end
     list_accepted_portfolio_shares()
     list_accepted_portfolio_shares(params::Dict{String,<:Any})
 
-Lists all portfolios for which sharing was accepted by this account.
+Lists all imported portfolios for which account-to-account shares were accepted by this
+account. By specifying the PortfolioShareType, you can list portfolios for which
+organizational shares were accepted by this account.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -2489,9 +2491,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"PageToken"`: The page token for the next set of results. To retrieve the first set of
   results, use null.
 - `"PortfolioShareType"`: The type of shared portfolios to list. The default is to list
-  imported portfolios.    AWS_ORGANIZATIONS - List portfolios shared by the management
-  account of your organization    AWS_SERVICECATALOG - List default portfolios    IMPORTED -
-  List imported portfolios
+  imported portfolios.    AWS_ORGANIZATIONS - List portfolios accepted and shared via
+  organizational sharing by the management account or delegated administrator of your
+  organization.    AWS_SERVICECATALOG - Deprecated type.    IMPORTED - List imported
+  portfolios that have been accepted and shared through account-to-account sharing.
 """
 function list_accepted_portfolio_shares(; aws_config::AbstractAWSConfig=global_aws_config())
     return service_catalog(

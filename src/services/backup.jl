@@ -1371,6 +1371,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   vault. Backup vaults are identified by names that are unique to the account used to create
   them and the Amazon Web Services Region where they are created. They consist of lowercase
   letters, numbers, and hyphens.
+- `"completeAfter"`: Returns only backup jobs completed after a date expressed in Unix
+  format and Coordinated Universal Time (UTC).
+- `"completeBefore"`: Returns only backup jobs completed before a date expressed in Unix
+  format and Coordinated Universal Time (UTC).
 - `"createdAfter"`: Returns only backup jobs that were created after the specified date.
 - `"createdBefore"`: Returns only backup jobs that were created before the specified date.
 - `"maxResults"`: The maximum number of items to be returned.
@@ -1379,10 +1383,12 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   items in your list starting at the location pointed to by the next token.
 - `"resourceArn"`: Returns only backup jobs that match the specified resource Amazon
   Resource Name (ARN).
-- `"resourceType"`: Returns only backup jobs for the specified resources:    DynamoDB for
-  Amazon DynamoDB    EBS for Amazon Elastic Block Store    EC2 for Amazon Elastic Compute
-  Cloud    EFS for Amazon Elastic File System    RDS for Amazon Relational Database Service
-   Aurora for Amazon Aurora    Storage Gateway for Storage Gateway
+- `"resourceType"`: Returns only backup jobs for the specified resources:    Aurora for
+  Amazon Aurora    DocumentDB for Amazon DocumentDB (with MongoDB compatibility)    DynamoDB
+  for Amazon DynamoDB    EBS for Amazon Elastic Block Store    EC2 for Amazon Elastic Compute
+  Cloud    EFS for Amazon Elastic File System    FSx for Amazon FSx    Neptune for Amazon
+  Neptune    RDS for Amazon Relational Database Service    Storage Gateway for Storage
+  Gateway    S3 for Amazon S3    VirtualMachine for virtual machines
 - `"state"`: Returns only backup jobs that are in the specified state.
 """
 function list_backup_jobs(; aws_config::AbstractAWSConfig=global_aws_config())
@@ -1592,6 +1598,10 @@ Returns metadata about your copy jobs.
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"accountId"`: The account ID to list the jobs from. Returns only copy jobs associated
   with the specified account ID.
+- `"completeAfter"`: Returns only copy jobs completed after a date expressed in Unix format
+  and Coordinated Universal Time (UTC).
+- `"completeBefore"`: Returns only copy jobs completed before a date expressed in Unix
+  format and Coordinated Universal Time (UTC).
 - `"createdAfter"`: Returns only copy jobs that were created after the specified date.
 - `"createdBefore"`: Returns only copy jobs that were created before the specified date.
 - `"destinationVaultArn"`: An Amazon Resource Name (ARN) that uniquely identifies a source
@@ -1603,10 +1613,12 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   items in your list starting at the location pointed to by the next token.
 - `"resourceArn"`: Returns only copy jobs that match the specified resource Amazon Resource
   Name (ARN).
-- `"resourceType"`: Returns only backup jobs for the specified resources:    DynamoDB for
-  Amazon DynamoDB    EBS for Amazon Elastic Block Store    EC2 for Amazon Elastic Compute
-  Cloud    EFS for Amazon Elastic File System    RDS for Amazon Relational Database Service
-   Aurora for Amazon Aurora    Storage Gateway for Storage Gateway
+- `"resourceType"`: Returns only backup jobs for the specified resources:    Aurora for
+  Amazon Aurora    DocumentDB for Amazon DocumentDB (with MongoDB compatibility)    DynamoDB
+  for Amazon DynamoDB    EBS for Amazon Elastic Block Store    EC2 for Amazon Elastic Compute
+  Cloud    EFS for Amazon Elastic File System    FSx for Amazon FSx    Neptune for Amazon
+  Neptune    RDS for Amazon Relational Database Service    Storage Gateway for Storage
+  Gateway    S3 for Amazon S3    VirtualMachine for virtual machines
 - `"state"`: Returns only copy jobs that are in the specified state.
 """
 function list_copy_jobs(; aws_config::AbstractAWSConfig=global_aws_config())
@@ -1857,6 +1869,10 @@ about the recovery process.
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"accountId"`: The account ID to list the jobs from. Returns only restore jobs associated
   with the specified account ID.
+- `"completeAfter"`: Returns only copy jobs completed after a date expressed in Unix format
+  and Coordinated Universal Time (UTC).
+- `"completeBefore"`: Returns only copy jobs completed before a date expressed in Unix
+  format and Coordinated Universal Time (UTC).
 - `"createdAfter"`: Returns only restore jobs that were created after the specified date.
 - `"createdBefore"`: Returns only restore jobs that were created before the specified date.
 - `"maxResults"`: The maximum number of items to be returned.
@@ -1887,7 +1903,9 @@ end
     list_tags(resource_arn, params::Dict{String,<:Any})
 
 Returns a list of key-value pairs assigned to a target recovery point, backup plan, or
-backup vault.   ListTags are currently only supported with Amazon EFS backups.
+backup vault.  ListTags only works for resource types that support full Backup management
+of their backups. Those resource types are listed in the \"Full Backup management\" section
+of the  Feature availability by resource table.
 
 # Arguments
 - `resource_arn`: An Amazon Resource Name (ARN) that uniquely identifies a resource. The
@@ -2002,7 +2020,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   lifecycle policy with a retention period equal to or shorter than the maximum retention
   period. If the job's retention period is longer than that maximum retention period, then
   the vault fails the backup or copy job, and you should either modify your lifecycle
-  settings or use a different vault. Recovery points already saved in the vault prior to
+  settings or use a different vault. The longest maximum retention period you can specify is
+  36500 days (approximately 100 years). Recovery points already saved in the vault prior to
   Vault Lock are not affected.
 - `"MinRetentionDays"`: The Backup Vault Lock configuration that specifies the minimum
   retention period that the vault retains its recovery points. This setting can be useful if,
@@ -2012,8 +2031,9 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   vault must have a lifecycle policy with a retention period equal to or longer than the
   minimum retention period. If the job's retention period is shorter than that minimum
   retention period, then the vault fails that backup or copy job, and you should either
-  modify your lifecycle settings or use a different vault. Recovery points already saved in
-  the vault prior to Vault Lock are not affected.
+  modify your lifecycle settings or use a different vault. The shortest minimum retention
+  period you can specify is 1 day. Recovery points already saved in the vault prior to Vault
+  Lock are not affected.
 """
 function put_backup_vault_lock_configuration(
     backupVaultName; aws_config::AbstractAWSConfig=global_aws_config()
@@ -2050,8 +2070,9 @@ Turns on notifications on a backup vault for the specified topic and events.
   resources to the backup vault. For common use cases and code samples, see Using Amazon SNS
   to track Backup events. The following events are supported:    BACKUP_JOB_STARTED |
   BACKUP_JOB_COMPLETED     COPY_JOB_STARTED | COPY_JOB_SUCCESSFUL | COPY_JOB_FAILED
-  RESTORE_JOB_STARTED | RESTORE_JOB_COMPLETED | RECOVERY_POINT_MODIFIED     Ignore the list
-  below because it includes deprecated events. Refer to the list above.
+  RESTORE_JOB_STARTED | RESTORE_JOB_COMPLETED | RECOVERY_POINT_MODIFIED
+  S3_BACKUP_OBJECT_FAILED | S3_RESTORE_OBJECT_FAILED     Ignore the list below because it
+  includes deprecated events. Refer to the list above.
 - `snstopic_arn`: The Amazon Resource Name (ARN) that specifies the topic for a backup
   vault’s events; for example, arn:aws:sns:us-west-2:111122223333:MyVaultTopic.
 - `backup_vault_name`: The name of a logical container where backups are stored. Backup
@@ -2124,7 +2145,7 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   VSS backup. Set to \"WindowsVSS\"\"disabled\" to create a regular backup. The WindowsVSS
   option is not enabled by default.
 - `"CompleteWindowMinutes"`: A value in minutes during which a successfully started backup
-  must complete, or else AWS Backup will cancel the job. This value is optional. This value
+  must complete, or else Backup will cancel the job. This value is optional. This value
   begins counting down from when the backup was scheduled. It does not add additional time
   for StartWindowMinutes, or if the backup started later than scheduled.
 - `"IdempotencyToken"`: A customer-chosen string that you can use to distinguish between
@@ -2133,11 +2154,13 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"Lifecycle"`: The lifecycle defines when a protected resource is transitioned to cold
   storage and when it expires. Backup will transition and expire backups automatically
   according to the lifecycle that you define.  Backups transitioned to cold storage must be
-  stored in cold storage for a minimum of 90 days. Therefore, the “expire after days”
-  setting must be 90 days greater than the “transition to cold after days” setting. The
+  stored in cold storage for a minimum of 90 days. Therefore, the “retention” setting
+  must be 90 days greater than the “transition to cold after days” setting. The
   “transition to cold after days” setting cannot be changed after a backup has been
-  transitioned to cold.  Only Amazon EFS file system backups can be transitioned to cold
-  storage.
+  transitioned to cold.  Only resource types that support full Backup management can
+  transition their backups to cold storage. Those resource types are listed in the \"Full
+  Backup management\" section of the  Feature availability by resource table. Backup ignores
+  this expression for other resource types.
 - `"RecoveryPointTags"`: To help organize your resources, you can assign your own metadata
   to the resources that you create. Each tag is a key-value pair.
 - `"StartWindowMinutes"`: A value in minutes after a backup is scheduled before a job will
@@ -2343,10 +2366,11 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   otherwise identical calls to StartRestoreJob. Retrying a successful request with the same
   idempotency token results in a success message with no action taken.
 - `"ResourceType"`: Starts a job to restore a recovery point for one of the following
-  resources:    DynamoDB for Amazon DynamoDB    EBS for Amazon Elastic Block Store    EC2 for
-  Amazon Elastic Compute Cloud    EFS for Amazon Elastic File System    RDS for Amazon
-  Relational Database Service    Aurora for Amazon Aurora    Storage Gateway for Storage
-  Gateway
+  resources:    Aurora for Amazon Aurora    DocumentDB for Amazon DocumentDB (with MongoDB
+  compatibility)    DynamoDB for Amazon DynamoDB    EBS for Amazon Elastic Block Store    EC2
+  for Amazon Elastic Compute Cloud    EFS for Amazon Elastic File System    FSx for Amazon
+  FSx    Neptune for Amazon Neptune    RDS for Amazon Relational Database Service    Storage
+  Gateway for Storage Gateway    S3 for Amazon S3    VirtualMachine for virtual machines
 """
 function start_restore_job(
     IamRoleArn,
@@ -2633,11 +2657,13 @@ Sets the transition lifecycle of a recovery point. The lifecycle defines when a 
 resource is transitioned to cold storage and when it expires. Backup transitions and
 expires backups automatically according to the lifecycle that you define. Backups
 transitioned to cold storage must be stored in cold storage for a minimum of 90 days.
-Therefore, the “expire after days” setting must be 90 days greater than the
-“transition to cold after days” setting. The “transition to cold after days”
-setting cannot be changed after a backup has been transitioned to cold. Only Amazon EFS
-file system backups can be transitioned to cold storage. Does not support continuous
-backups.
+Therefore, the “retention” setting must be 90 days greater than the “transition to
+cold after days” setting. The “transition to cold after days” setting cannot be
+changed after a backup has been transitioned to cold. Only resource types that support full
+Backup management can transition their backups to cold storage. Those resource types are
+listed in the \"Full Backup management\" section of the  Feature availability by resource
+table. Backup ignores this expression for other resource types. This operation does not
+support continuous backups.
 
 # Arguments
 - `backup_vault_name`: The name of a logical container where backups are stored. Backup
@@ -2653,10 +2679,9 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"Lifecycle"`: The lifecycle defines when a protected resource is transitioned to cold
   storage and when it expires. Backup transitions and expires backups automatically according
   to the lifecycle that you define.  Backups transitioned to cold storage must be stored in
-  cold storage for a minimum of 90 days. Therefore, the “expire after days” setting must
-  be 90 days greater than the “transition to cold after days” setting. The “transition
-  to cold after days” setting cannot be changed after a backup has been transitioned to
-  cold.
+  cold storage for a minimum of 90 days. Therefore, the “retention” setting must be 90
+  days greater than the “transition to cold after days” setting. The “transition to
+  cold after days” setting cannot be changed after a backup has been transitioned to cold.
 """
 function update_recovery_point_lifecycle(
     backupVaultName, recoveryPointArn; aws_config::AbstractAWSConfig=global_aws_config()
@@ -2695,8 +2720,10 @@ DescribeRegionSettings API to determine the resource types that are supported.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"ResourceTypeManagementPreference"`: Enables or disables  Backup's advanced DynamoDB
-  backup features for the Region.
+- `"ResourceTypeManagementPreference"`: Enables or disables full Backup management of
+  backups for a resource type. To enable full Backup management for DynamoDB along with
+  Backup's advanced DynamoDB backup features, follow the procedure to  enable advanced
+  DynamoDB backup programmatically.
 - `"ResourceTypeOptInPreference"`: Updates the list of services along with the opt-in
   preferences for the Region.
 """

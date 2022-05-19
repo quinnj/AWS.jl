@@ -172,6 +172,7 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"availabilityZone"`: The Availability Zone that you want to create the flow in. These
   options are limited to the Availability Zones within the current AWS Region.
 - `"entitlements"`: The entitlements that you want to grant on a flow.
+- `"maintenance"`:
 - `"mediaStreams"`: The media streams that you want to add to the flow. You can associate
   these media streams with sources and outputs on the flow.
 - `"outputs"`: The outputs that you want to add to this flow.
@@ -941,6 +942,7 @@ Updates flow
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"maintenance"`:
 - `"sourceFailoverConfig"`:
 """
 function update_flow(flowArn; aws_config::AbstractAWSConfig=global_aws_config())

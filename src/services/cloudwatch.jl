@@ -697,31 +697,43 @@ end
     get_metric_data(end_time, metric_data_queries, start_time)
     get_metric_data(end_time, metric_data_queries, start_time, params::Dict{String,<:Any})
 
-You can use the GetMetricData API to retrieve as many as 500 different metrics in a single
-request, with a total of as many as 100,800 data points. You can also optionally perform
-math expressions on the values of the returned statistics, to create new time series that
-represent new insights into your data. For example, using Lambda metrics, you could divide
-the Errors metric by the Invocations metric to get an error rate time series. For more
-information about metric math expressions, see Metric Math Syntax and Functions in the
-Amazon CloudWatch User Guide. Calls to the GetMetricData API have a different pricing
-structure than calls to GetMetricStatistics. For more information about pricing, see Amazon
-CloudWatch Pricing. Amazon CloudWatch retains metric data as follows:   Data points with a
-period of less than 60 seconds are available for 3 hours. These data points are
-high-resolution metrics and are available only for custom metrics that have been defined
-with a StorageResolution of 1.   Data points with a period of 60 seconds (1-minute) are
-available for 15 days.   Data points with a period of 300 seconds (5-minute) are available
-for 63 days.   Data points with a period of 3600 seconds (1 hour) are available for 455
-days (15 months).   Data points that are initially published with a shorter period are
-aggregated together for long-term storage. For example, if you collect data using a period
-of 1 minute, the data remains available for 15 days with 1-minute resolution. After 15
-days, this data is still available, but is aggregated and retrievable only with a
+You can use the GetMetricData API to retrieve CloudWatch metric values. The operation can
+also include a CloudWatch Metrics Insights query, and one or more metric math functions. A
+GetMetricData operation that does not include a query can retrieve as many as 500 different
+metrics in a single request, with a total of as many as 100,800 data points. You can also
+optionally perform metric math expressions on the values of the returned statistics, to
+create new time series that represent new insights into your data. For example, using
+Lambda metrics, you could divide the Errors metric by the Invocations metric to get an
+error rate time series. For more information about metric math expressions, see Metric Math
+Syntax and Functions in the Amazon CloudWatch User Guide. If you include a Metrics Insights
+query, each GetMetricData operation can include only one query. But the same GetMetricData
+operation can also retrieve other metrics. Metrics Insights queries can query only the most
+recent three hours of metric data. For more information about Metrics Insights, see Query
+your metrics with CloudWatch Metrics Insights. Calls to the GetMetricData API have a
+different pricing structure than calls to GetMetricStatistics. For more information about
+pricing, see Amazon CloudWatch Pricing. Amazon CloudWatch retains metric data as follows:
+Data points with a period of less than 60 seconds are available for 3 hours. These data
+points are high-resolution metrics and are available only for custom metrics that have been
+defined with a StorageResolution of 1.   Data points with a period of 60 seconds (1-minute)
+are available for 15 days.   Data points with a period of 300 seconds (5-minute) are
+available for 63 days.   Data points with a period of 3600 seconds (1 hour) are available
+for 455 days (15 months).   Data points that are initially published with a shorter period
+are aggregated together for long-term storage. For example, if you collect data using a
+period of 1 minute, the data remains available for 15 days with 1-minute resolution. After
+15 days, this data is still available, but is aggregated and retrievable only with a
 resolution of 5 minutes. After 63 days, the data is further aggregated and is available
 with a resolution of 1 hour. If you omit Unit in your request, all data that was collected
 with any unit is returned, along with the corresponding units that were specified when the
 data was reported to CloudWatch. If you specify a unit, the operation returns only data
 that was collected with that unit specified. If you specify a unit that does not match the
 data collected, the results of the operation are null. CloudWatch does not perform unit
-conversions.
+conversions.  Using Metrics Insights queries with metric math  You can't mix a Metric
+Insights query and metric math syntax in the same expression, but you can reference results
+from a Metrics Insights query within other Metric math expressions. A Metrics Insights
+query without a GROUP BY clause returns a single time-series (TS), and can be used as input
+for a metric math expression that expects a single time series. A Metrics Insights query
+with a GROUP BY clause returns an array of time-series (TS[]), and can be used as input for
+a metric math expression that expects an array of time series.
 
 # Arguments
 - `end_time`: The time stamp indicating the latest data to be returned. The value specified
@@ -732,7 +744,8 @@ conversions.
   CloudWatch than setting 12:07 or 12:29 as the EndTime.
 - `metric_data_queries`: The metric queries to be returned. A single GetMetricData call can
   include as many as 500 MetricDataQuery structures. Each of these structures can specify
-  either a metric to retrieve, or a math expression to perform on retrieved data.
+  either a metric to retrieve, a Metrics Insights query, or a math expression to perform on
+  retrieved data.
 - `start_time`: The time stamp indicating the earliest data to be returned. The value
   specified is inclusive; results include data points with the specified time stamp.
   CloudWatch rounds the specified time stamp as follows:   Start time less than 15 days ago -
@@ -1222,7 +1235,9 @@ Creates or updates a composite alarm. When you create a composite alarm, you spe
 expression for the alarm that takes into account the alarm states of other alarms that you
 have created. The composite alarm goes into ALARM state only if all conditions of the rule
 are met. The alarms specified in a composite alarm's rule expression can include metric
-alarms and other composite alarms. Using composite alarms can reduce alarm noise. You can
+alarms and other composite alarms. The rule expression of a composite alarm can include as
+many as 100 underlying alarms. Any single alarm can be included in the rule expressions of
+as many as 150 composite alarms. Using composite alarms can reduce alarm noise. You can
 create multiple metric alarms, and also create a composite alarm and set up alerts only for
 the composite alarm. For example, you could create a composite alarm that goes into ALARM
 state only when more than one of the underlying metric alarms are in ALARM state.
@@ -1592,7 +1607,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"TreatMissingData"`:  Sets how this alarm is to handle missing data points. If
   TreatMissingData is omitted, the default behavior of missing is used. For more information,
   see Configuring How CloudWatch Alarms Treats Missing Data. Valid Values: breaching |
-  notBreaching | ignore | missing
+  notBreaching | ignore | missing   Alarms that evaluate metrics in the AWS/DynamoDB
+  namespace always ignore missing data even if you choose a different option for
+  TreatMissingData. When an AWS/DynamoDB metric has missing data, alarms that evaluate that
+  metric remain in their current state.
 - `"Unit"`: The unit of measure for the statistic. For example, the units for the Amazon
   EC2 NetworkIn metric are Bytes because NetworkIn tracks the number of bytes that an
   instance receives on all network interfaces. You can also specify a unit when you create a
@@ -1729,7 +1747,11 @@ CloudWatchFullAccess policy or the cloudwatch:PutMetricStream permission. When y
 or update a metric stream, you choose one of the following:   Stream metrics from all
 metric namespaces in the account.   Stream metrics from all metric namespaces in the
 account, except for the namespaces that you list in ExcludeFilters.   Stream metrics from
-only the metric namespaces that you list in IncludeFilters.   When you use PutMetricStream
+only the metric namespaces that you list in IncludeFilters.   By default, a metric stream
+always sends the MAX, MIN, SUM, and SAMPLECOUNT statistics for each metric that is
+streamed. You can use the StatisticsConfigurations parameter to have the metric stream also
+send additional statistics in the stream. Streaming additional statistics incurs additional
+costs. For more information, see Amazon CloudWatch Pricing.  When you use PutMetricStream
 to create a new metric stream, the stream is created in the running state. If you use it to
 update an existing stream, the state of the stream is not changed.
 
@@ -1757,6 +1779,15 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"IncludeFilters"`: If you specify this parameter, the stream sends only the metrics from
   the metric namespaces that you specify here. You cannot include IncludeFilters and
   ExcludeFilters in the same operation.
+- `"StatisticsConfigurations"`: By default, a metric stream always sends the MAX, MIN, SUM,
+  and SAMPLECOUNT statistics for each metric that is streamed. You can use this parameter to
+  have the metric stream also send additional statistics in the stream. This array can have
+  up to 100 members. For each entry in this array, you specify one or more metrics and the
+  list of additional statistics to stream for those metrics. The additional statistics that
+  you can stream depend on the stream's OutputFormat. If the OutputFormat is json, you can
+  stream any additional statistic that is supported by CloudWatch, listed in  CloudWatch
+  statistics definitions. If the OutputFormat is opentelemetry0.7, you can stream percentile
+  statistics such as p95, p99.9 and so on.
 - `"Tags"`: A list of key-value pairs to associate with the metric stream. You can
   associate as many as 50 tags with a metric stream. Tags can help you organize and
   categorize your resources. You can also use them to scope user permissions by granting a

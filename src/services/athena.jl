@@ -96,8 +96,9 @@ are visible to all users of the same Amazon Web Services account.
 
 # Arguments
 - `name`: The name of the data catalog to create. The catalog name must be unique for the
-  Amazon Web Services account and can use a maximum of 128 alphanumeric, underscore, at sign,
-  or hyphen characters.
+  Amazon Web Services account and can use a maximum of 127 alphanumeric, underscore, at sign,
+  or hyphen characters. The remainder of the length constraint of 256 is reserved for use by
+  Athena.
 - `type`: The type of data catalog to create: LAMBDA for a federated catalog, HIVE for an
   external hive metastore, or GLUE for an Glue Data Catalog.
 
@@ -1298,8 +1299,9 @@ Updates the data catalog that has the specified name.
 
 # Arguments
 - `name`: The name of the data catalog to update. The catalog name must be unique for the
-  Amazon Web Services account and can use a maximum of 128 alphanumeric, underscore, at sign,
-  or hyphen characters.
+  Amazon Web Services account and can use a maximum of 127 alphanumeric, underscore, at sign,
+  or hyphen characters. The remainder of the length constraint of 256 is reserved for use by
+  Athena.
 - `type`: Specifies the type of data catalog to update. Specify LAMBDA for a federated
   catalog, HIVE for an external hive metastore, or GLUE for an Glue Data Catalog.
 
@@ -1336,6 +1338,58 @@ function update_data_catalog(
         "UpdateDataCatalog",
         Dict{String,Any}(
             mergewith(_merge, Dict{String,Any}("Name" => Name, "Type" => Type), params)
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    update_named_query(name, named_query_id, query_string)
+    update_named_query(name, named_query_id, query_string, params::Dict{String,<:Any})
+
+Updates a NamedQuery object. The database or workgroup cannot be updated.
+
+# Arguments
+- `name`: The name of the query.
+- `named_query_id`: The unique identifier (UUID) of the query.
+- `query_string`: The contents of the query with all query statements.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"Description"`: The query description.
+"""
+function update_named_query(
+    Name, NamedQueryId, QueryString; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return athena(
+        "UpdateNamedQuery",
+        Dict{String,Any}(
+            "Name" => Name, "NamedQueryId" => NamedQueryId, "QueryString" => QueryString
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function update_named_query(
+    Name,
+    NamedQueryId,
+    QueryString,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return athena(
+        "UpdateNamedQuery",
+        Dict{String,Any}(
+            mergewith(
+                _merge,
+                Dict{String,Any}(
+                    "Name" => Name,
+                    "NamedQueryId" => NamedQueryId,
+                    "QueryString" => QueryString,
+                ),
+                params,
+            ),
         );
         aws_config=aws_config,
         feature_set=SERVICE_FEATURE_SET,

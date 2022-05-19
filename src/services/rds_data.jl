@@ -247,8 +247,8 @@ end
 
 Runs a SQL statement against a database.  If a call isn't part of a transaction because it
 doesn't include the transactionID parameter, changes that result from the call are
-committed automatically.  The response size limit is 1 MB. If the call returns more than 1
-MB of response data, the call is terminated.
+committed automatically.  If the binary response data from the database is more than 1 MB,
+the call is terminated.
 
 # Arguments
 - `resource_arn`: The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster.
@@ -263,6 +263,11 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   times out. When a DDL statement terminates before it is finished running, it can result in
   errors and possibly corrupted data structures.
 - `"database"`: The name of the database.
+- `"formatRecordsAs"`: A value that indicates whether to format the result set as a single
+  JSON string. This parameter only applies to SELECT statements and is ignored for other
+  types of statements. Allowed values are NONE and JSON. The default value is NONE. The
+  result is returned in the formattedRecords field. For usage information about the JSON
+  format for result sets, see Using the Data API in the Amazon Aurora User Guide.
 - `"includeResultMetadata"`: A value that indicates whether to include metadata in the
   results.
 - `"parameters"`: The parameters for the SQL statement.  Array parameters are not

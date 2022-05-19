@@ -442,7 +442,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   organization. Each tag consists of a key and an optional value. You define both. Node group
   tags do not propagate to any other resources associated with the node group, such as the
   Amazon EC2 instances or subnets.
-- `"taints"`: The Kubernetes taints to be applied to the nodes in the node group.
+- `"taints"`: The Kubernetes taints to be applied to the nodes in the node group. For more
+  information, see Node taints on managed node groups.
 - `"updateConfig"`: The node group update configuration.
 - `"version"`: The Kubernetes version to use for your managed nodes. By default, the
   Kubernetes version of the cluster is used, and this is the only accepted specified value.
@@ -907,9 +908,9 @@ end
     describe_update(name, update_id, params::Dict{String,<:Any})
 
 Returns descriptive information about an update against your Amazon EKS cluster or
-associated managed node group. When the status of the update is Succeeded, the update is
-complete. If an update fails, the status is Failed, and an error detail explains the reason
-for the failure.
+associated managed node group or Amazon EKS add-on. When the status of the update is
+Succeeded, the update is complete. If an update fails, the status is Failed, and an error
+detail explains the reason for the failure.
 
 # Arguments
 - `name`: The name of the Amazon EKS cluster associated with the update.
@@ -918,8 +919,9 @@ for the failure.
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"addonName"`: The name of the add-on. The name must match one of the names returned by
-  ListAddons .
-- `"nodegroupName"`: The name of the Amazon EKS node group associated with the update.
+  ListAddons . This parameter is required if the update is an add-on update.
+- `"nodegroupName"`: The name of the Amazon EKS node group associated with the update. This
+  parameter is required if the update is a node group update.
 """
 function describe_update(name, updateId; aws_config::AbstractAWSConfig=global_aws_config())
     return eks(
@@ -1628,7 +1630,7 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"scalingConfig"`: The scaling configuration details for the Auto Scaling group after the
   update.
 - `"taints"`: The Kubernetes taints to be applied to the nodes in the node group after the
-  update.
+  update. For more information, see Node taints on managed node groups.
 - `"updateConfig"`: The node group update configuration.
 """
 function update_nodegroup_config(

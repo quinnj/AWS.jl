@@ -235,6 +235,9 @@ Exports component configurations to code that is ready to integrate into an Ampl
 - `app_id`: The unique ID of the Amplify app to export components to.
 - `environment_name`: The name of the backend environment that is a part of the Amplify app.
 
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"nextToken"`: The token to request the next page of results.
 """
 function export_components(
     appId, environmentName; aws_config::AbstractAWSConfig=global_aws_config()
@@ -271,6 +274,9 @@ Exports theme configurations to code that is ready to integrate into an Amplify 
 - `app_id`: The unique ID of the Amplify app to export the themes to.
 - `environment_name`: The name of the backend environment that is part of the Amplify app.
 
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"nextToken"`: The token to request the next page of results.
 """
 function export_themes(
     appId, environmentName; aws_config::AbstractAWSConfig=global_aws_config()

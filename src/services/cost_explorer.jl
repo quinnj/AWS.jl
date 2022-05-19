@@ -14,6 +14,18 @@ specification.
 # Arguments
 - `anomaly_monitor`: The cost anomaly detection monitor object that you want to create.
 
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"ResourceTags"`:  An optional list of tags to associate with the specified
+  AnomalyMonitor . You can use resource tags to control access to your monitor using IAM
+  policies. Each tag consists of a key and a value, and each key must be unique for the
+  resource. The following restrictions apply to resource tags:   Although the maximum number
+  of array members is 200, you can assign a maximum of 50 user-tags to one resource. The
+  remaining are reserved for Amazon Web Services use   The maximum length of a key is 128
+  characters   The maximum length of a value is 256 characters   Valid characters for keys
+  and values are: A-Z, a-z, spaces, _.:/=+-    Keys and values are case sensitive   Keys and
+  values are trimmed for any leading or trailing whitespaces   Don’t use aws: as a prefix
+  for your keys. This prefix is reserved for Amazon Web Services use
 """
 function create_anomaly_monitor(
     AnomalyMonitor; aws_config::AbstractAWSConfig=global_aws_config()
@@ -51,6 +63,18 @@ threshold and a time frequency for receiving notifications.
 # Arguments
 - `anomaly_subscription`: The cost anomaly subscription object that you want to create.
 
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"ResourceTags"`:  An optional list of tags to associate with the specified
+  AnomalySubscription . You can use resource tags to control access to your subscription
+  using IAM policies. Each tag consists of a key and a value, and each key must be unique for
+  the resource. The following restrictions apply to resource tags:   Although the maximum
+  number of array members is 200, you can assign a maximum of 50 user-tags to one resource.
+  The remaining are reserved for Amazon Web Services use   The maximum length of a key is 128
+  characters   The maximum length of a value is 256 characters   Valid characters for keys
+  and values are: A-Z, a-z, spaces, _.:/=+-    Keys and values are case sensitive   Keys and
+  values are trimmed for any leading or trailing whitespaces   Don’t use aws: as a prefix
+  for your keys. This prefix is reserved for Amazon Web Services use
 """
 function create_anomaly_subscription(
     AnomalySubscription; aws_config::AbstractAWSConfig=global_aws_config()
@@ -96,6 +120,16 @@ Creates a new Cost Category with the requested name and rules.
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"DefaultValue"`:
+- `"ResourceTags"`:  An optional list of tags to associate with the specified  CostCategory
+  . You can use resource tags to control access to your cost category using IAM policies.
+  Each tag consists of a key and a value, and each key must be unique for the resource. The
+  following restrictions apply to resource tags:   Although the maximum number of array
+  members is 200, you can assign a maximum of 50 user-tags to one resource. The remaining are
+  reserved for Amazon Web Services use   The maximum length of a key is 128 characters   The
+  maximum length of a value is 256 characters   Valid characters for keys and values are:
+  A-Z, a-z, spaces, _.:/=+-    Keys and values are case sensitive   Keys and values are
+  trimmed for any leading or trailing whitespaces   Don’t use aws: as a prefix for your
+  keys. This prefix is reserved for Amazon Web Services use
 - `"SplitChargeRules"`:  The split charge rules used to allocate your charges between your
   Cost Category values.
 """
@@ -429,12 +463,16 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"Filter"`: Filters Amazon Web Services costs by different dimensions. For example, you
   can specify SERVICE and LINKED_ACCOUNT and get the costs that are associated with that
   account's usage of that service. You can nest Expression objects to define any combination
-  of dimension filters. For more information, see Expression.
+  of dimension filters. For more information, see Expression.  Valid values for MatchOptions
+  for Dimensions are EQUALS and CASE_SENSITIVE. Valid values for MatchOptions for
+  CostCategories and Tags are EQUALS, ABSENT, and CASE_SENSITIVE. Default values are EQUALS
+  and CASE_SENSITIVE.
 - `"GroupBy"`: You can group Amazon Web Services costs using up to two different groups,
   either dimensions, tag keys, cost categories, or any two group by types. Valid values for
-  the DIMENSION type are AZ, INSTANCE_TYPE, LEGAL_ENTITY_NAME, LINKED_ACCOUNT, OPERATION,
-  PLATFORM, PURCHASE_TYPE, SERVICE, TENANCY, RECORD_TYPE, and USAGE_TYPE. When you group by
-  the TAG type and include a valid tag key, you get all tag values, including empty strings.
+  the DIMENSION type are AZ, INSTANCE_TYPE, LEGAL_ENTITY_NAME, INVOICING_ENTITY,
+  LINKED_ACCOUNT, OPERATION, PLATFORM, PURCHASE_TYPE, SERVICE, TENANCY, RECORD_TYPE, and
+  USAGE_TYPE. When you group by the TAG type and include a valid tag key, you get all tag
+  values, including empty strings.
 - `"NextPageToken"`: The token to retrieve the next set of results. Amazon Web Services
   provides the token when the response from a previous call has more results than the maximum
   page size.
@@ -498,7 +536,9 @@ User Guide.
   of dimension filters. For more information, see Expression.  The
   GetCostAndUsageWithResources operation requires that you either group by or filter by a
   ResourceId. It requires the Expression \"SERVICE = Amazon Elastic Compute Cloud - Compute\"
-  in the filter.
+  in the filter. Valid values for MatchOptions for Dimensions are EQUALS and CASE_SENSITIVE.
+  Valid values for MatchOptions for CostCategories and Tags are EQUALS, ABSENT, and
+  CASE_SENSITIVE. Default values are EQUALS and CASE_SENSITIVE.
 - `granularity`: Sets the Amazon Web Services cost granularity to MONTHLY, DAILY, or
   HOURLY. If Granularity isn't set, the response object doesn't include the Granularity,
   MONTHLY, DAILY, or HOURLY.
@@ -711,43 +751,57 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   the context is set to COST_AND_USAGE, the resulting dimension values can be used in the
   GetCostAndUsage operation. If you set the context to COST_AND_USAGE, you can use the
   following dimensions for searching:   AZ - The Availability Zone. An example is us-east-1a.
-    DATABASE_ENGINE - The Amazon Relational Database Service database. Examples are Aurora or
-  MySQL.   INSTANCE_TYPE - The type of Amazon EC2 instance. An example is m4.xlarge.
-  LEGAL_ENTITY_NAME - The name of the organization that sells you Amazon Web Services
-  services, such as Amazon Web Services.   LINKED_ACCOUNT - The description in the attribute
-  map that includes the full name of the member account. The value field contains the Amazon
-  Web Services ID of the member account.   OPERATING_SYSTEM - The operating system. Examples
-  are Windows or Linux.   OPERATION - The action performed. Examples include RunInstance and
-  CreateBucket.   PLATFORM - The Amazon EC2 operating system. Examples are Windows or Linux.
-   PURCHASE_TYPE - The reservation type of the purchase to which this usage is related.
-  Examples include On-Demand Instances and Standard Reserved Instances.   SERVICE - The
-  Amazon Web Services service such as Amazon DynamoDB.   USAGE_TYPE - The type of usage. An
-  example is DataTransfer-In-Bytes. The response for the GetDimensionValues operation
-  includes a unit attribute. Examples include GB and Hrs.   USAGE_TYPE_GROUP - The grouping
-  of common usage types. An example is Amazon EC2: CloudWatch – Alarms. The response for
-  this operation includes a unit attribute.   REGION - The Amazon Web Services Region.
-  RECORD_TYPE - The different types of charges such as RI fees, usage costs, tax refunds, and
-  credits.   RESOURCE_ID - The unique identifier of the resource. ResourceId is an opt-in
-  feature only available for last 14 days for EC2-Compute Service.   If you set the context
-  to RESERVATIONS, you can use the following dimensions for searching:   AZ - The
-  Availability Zone. An example is us-east-1a.   CACHE_ENGINE - The Amazon ElastiCache
-  operating system. Examples are Windows or Linux.   DEPLOYMENT_OPTION - The scope of Amazon
-  Relational Database Service deployments. Valid values are SingleAZ and MultiAZ.
-  INSTANCE_TYPE - The type of Amazon EC2 instance. An example is m4.xlarge.   LINKED_ACCOUNT
-  - The description in the attribute map that includes the full name of the member account.
-  The value field contains the Amazon Web Services ID of the member account.   PLATFORM - The
-  Amazon EC2 operating system. Examples are Windows or Linux.   REGION - The Amazon Web
-  Services Region.   SCOPE (Utilization only) - The scope of a Reserved Instance (RI). Values
-  are regional or a single Availability Zone.   TAG (Coverage only) - The tags that are
-  associated with a Reserved Instance (RI).   TENANCY - The tenancy of a resource. Examples
-  are shared or dedicated.   If you set the context to SAVINGS_PLANS, you can use the
-  following dimensions for searching:   SAVINGS_PLANS_TYPE - Type of Savings Plans (EC2
-  Instance or Compute)   PAYMENT_OPTION - Payment option for the given Savings Plans (for
-  example, All Upfront)   REGION - The Amazon Web Services Region.   INSTANCE_TYPE_FAMILY -
-  The family of instances (For example, m5)   LINKED_ACCOUNT - The description in the
-  attribute map that includes the full name of the member account. The value field contains
-  the Amazon Web Services ID of the member account.   SAVINGS_PLAN_ARN - The unique
-  identifier for your Savings Plan
+    BILLING_ENTITY - The Amazon Web Services seller that your account is with. Possible
+  values are the following: - Amazon Web Services(Amazon Web Services): The entity that sells
+  Amazon Web Services services. - AISPL (Amazon Internet Services Pvt. Ltd.): The local
+  Indian entity that is an acting reseller for Amazon Web Services services in India. -
+  Amazon Web Services Marketplace: The entity that supports the sale of solutions built on
+  Amazon Web Services by third-party software providers.   CACHE_ENGINE - The Amazon
+  ElastiCache operating system. Examples are Windows or Linux.   DEPLOYMENT_OPTION - The
+  scope of Amazon Relational Database Service deployments. Valid values are SingleAZ and
+  MultiAZ.   DATABASE_ENGINE - The Amazon Relational Database Service database. Examples are
+  Aurora or MySQL.   INSTANCE_TYPE - The type of Amazon EC2 instance. An example is
+  m4.xlarge.   INSTANCE_TYPE_FAMILY - A family of instance types optimized to fit different
+  use cases. Examples are Compute Optimized (C4, C5, C6g, C7g etc.), Memory Optimization (R4,
+  R5n, R5b, R6g etc).   INVOICING_ENTITY - The name of the entity issuing the Amazon Web
+  Services invoice.   LEGAL_ENTITY_NAME - The name of the organization that sells you Amazon
+  Web Services services, such as Amazon Web Services.   LINKED_ACCOUNT - The description in
+  the attribute map that includes the full name of the member account. The value field
+  contains the Amazon Web Services ID of the member account.   OPERATING_SYSTEM - The
+  operating system. Examples are Windows or Linux.   OPERATION - The action performed.
+  Examples include RunInstance and CreateBucket.   PLATFORM - The Amazon EC2 operating
+  system. Examples are Windows or Linux.   PURCHASE_TYPE - The reservation type of the
+  purchase to which this usage is related. Examples include On-Demand Instances and Standard
+  Reserved Instances.   RESERVATION_ID - The unique identifier for an Amazon Web Services
+  Reservation Instance.   SAVINGS_PLAN_ARN - The unique identifier for your Savings Plans.
+  SAVINGS_PLANS_TYPE - Type of Savings Plans (EC2 Instance or Compute).   SERVICE - The
+  Amazon Web Services service such as Amazon DynamoDB.   TENANCY - The tenancy of a resource.
+  Examples are shared or dedicated.   USAGE_TYPE - The type of usage. An example is
+  DataTransfer-In-Bytes. The response for the GetDimensionValues operation includes a unit
+  attribute. Examples include GB and Hrs.   USAGE_TYPE_GROUP - The grouping of common usage
+  types. An example is Amazon EC2: CloudWatch – Alarms. The response for this operation
+  includes a unit attribute.   REGION - The Amazon Web Services Region.   RECORD_TYPE - The
+  different types of charges such as RI fees, usage costs, tax refunds, and credits.
+  RESOURCE_ID - The unique identifier of the resource. ResourceId is an opt-in feature only
+  available for last 14 days for EC2-Compute Service.   If you set the context to
+  RESERVATIONS, you can use the following dimensions for searching:   AZ - The Availability
+  Zone. An example is us-east-1a.   CACHE_ENGINE - The Amazon ElastiCache operating system.
+  Examples are Windows or Linux.   DEPLOYMENT_OPTION - The scope of Amazon Relational
+  Database Service deployments. Valid values are SingleAZ and MultiAZ.   INSTANCE_TYPE - The
+  type of Amazon EC2 instance. An example is m4.xlarge.   LINKED_ACCOUNT - The description in
+  the attribute map that includes the full name of the member account. The value field
+  contains the Amazon Web Services ID of the member account.   PLATFORM - The Amazon EC2
+  operating system. Examples are Windows or Linux.   REGION - The Amazon Web Services Region.
+    SCOPE (Utilization only) - The scope of a Reserved Instance (RI). Values are regional or
+  a single Availability Zone.   TAG (Coverage only) - The tags that are associated with a
+  Reserved Instance (RI).   TENANCY - The tenancy of a resource. Examples are shared or
+  dedicated.   If you set the context to SAVINGS_PLANS, you can use the following dimensions
+  for searching:   SAVINGS_PLANS_TYPE - Type of Savings Plans (EC2 Instance or Compute)
+  PAYMENT_OPTION - Payment option for the given Savings Plans (for example, All Upfront)
+  REGION - The Amazon Web Services Region.   INSTANCE_TYPE_FAMILY - The family of instances
+  (For example, m5)   LINKED_ACCOUNT - The description in the attribute map that includes the
+  full name of the member account. The value field contains the Amazon Web Services ID of the
+  member account.   SAVINGS_PLAN_ARN - The unique identifier for your Savings Plans.
 - `"Filter"`:
 - `"MaxResults"`: This field is only used when SortBy is provided in the request. The
   maximum number of objects that to be returned for this request. If MaxResults is not
@@ -830,8 +884,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   MONTHLY or DAILY. The GetReservationCoverage operation supports only DAILY and MONTHLY
   granularities.
 - `"GroupBy"`: You can group the data by the following attributes:   AZ   CACHE_ENGINE
-  DATABASE_ENGINE   DEPLOYMENT_OPTION   INSTANCE_TYPE   LINKED_ACCOUNT   OPERATING_SYSTEM
-  PLATFORM   REGION   TENANCY
+  DATABASE_ENGINE   DEPLOYMENT_OPTION   INSTANCE_TYPE   INVOICING_ENTITY   LINKED_ACCOUNT
+  OPERATING_SYSTEM   PLATFORM   REGION   TENANCY
 - `"MaxResults"`: The maximum number of objects that you returned for this request. If more
   objects are available, in the response, Amazon Web Services provides a NextPageToken value
   that you can use in a subsequent call to get the next batch of objects.
@@ -1470,6 +1524,43 @@ function list_cost_category_definitions(
 end
 
 """
+    list_tags_for_resource(resource_arn)
+    list_tags_for_resource(resource_arn, params::Dict{String,<:Any})
+
+Returns a list of resource tags associated with the resource specified by the Amazon
+Resource Name (ARN).
+
+# Arguments
+- `resource_arn`: The Amazon Resource Name (ARN) of the resource. For a list of supported
+  resources, see ResourceTag.
+
+"""
+function list_tags_for_resource(
+    ResourceArn; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return cost_explorer(
+        "ListTagsForResource",
+        Dict{String,Any}("ResourceArn" => ResourceArn);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function list_tags_for_resource(
+    ResourceArn,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return cost_explorer(
+        "ListTagsForResource",
+        Dict{String,Any}(
+            mergewith(_merge, Dict{String,Any}("ResourceArn" => ResourceArn), params)
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     provide_anomaly_feedback(anomaly_id, feedback)
     provide_anomaly_feedback(anomaly_id, feedback, params::Dict{String,<:Any})
 
@@ -1512,11 +1603,119 @@ function provide_anomaly_feedback(
 end
 
 """
+    tag_resource(resource_arn, resource_tags)
+    tag_resource(resource_arn, resource_tags, params::Dict{String,<:Any})
+
+An API operation for adding one or more tags (key-value pairs) to a resource. You can use
+the TagResource operation with a resource that already has tags. If you specify a new tag
+key for the resource, this tag is appended to the list of tags associated with the
+resource. If you specify a tag key that is already associated with the resource, the new
+tag value you specify replaces the previous value for that tag.  Although the maximum
+number of array members is 200, user-tag maximum is 50. The remaining are reserved for
+Amazon Web Services use.
+
+# Arguments
+- `resource_arn`: The Amazon Resource Name (ARN) of the resource. For a list of supported
+  resources, see ResourceTag.
+- `resource_tags`:  A list of tag key-value pairs to be added to the resource. Each tag
+  consists of a key and a value, and each key must be unique for the resource. The following
+  restrictions apply to resource tags:   Although the maximum number of array members is 200,
+  you can assign a maximum of 50 user-tags to one resource. The remaining are reserved for
+  Amazon Web Services use   The maximum length of a key is 128 characters   The maximum
+  length of a value is 256 characters   Valid characters for keys and values are: A-Z, a-z,
+  spaces, _.:/=+-    Keys and values are case sensitive   Keys and values are trimmed for any
+  leading or trailing whitespaces   Don’t use aws: as a prefix for your keys. This prefix
+  is reserved for Amazon Web Services use
+
+"""
+function tag_resource(
+    ResourceArn, ResourceTags; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return cost_explorer(
+        "TagResource",
+        Dict{String,Any}("ResourceArn" => ResourceArn, "ResourceTags" => ResourceTags);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function tag_resource(
+    ResourceArn,
+    ResourceTags,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return cost_explorer(
+        "TagResource",
+        Dict{String,Any}(
+            mergewith(
+                _merge,
+                Dict{String,Any}(
+                    "ResourceArn" => ResourceArn, "ResourceTags" => ResourceTags
+                ),
+                params,
+            ),
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    untag_resource(resource_arn, resource_tag_keys)
+    untag_resource(resource_arn, resource_tag_keys, params::Dict{String,<:Any})
+
+ Removes one or more tags from a resource. Specify only tag key(s) in your request. Do not
+specify the value.
+
+# Arguments
+- `resource_arn`:  The Amazon Resource Name (ARN) of the resource. For a list of supported
+  resources, see ResourceTag.
+- `resource_tag_keys`:  A list of tag keys associated with tags that need to be removed
+  from the resource. If you specify a tag key that does not exist, it is ignored. Although
+  the maximum number of array members is 200, user-tag maximum is 50. The remaining are
+  reserved for Amazon Web Services use.
+
+"""
+function untag_resource(
+    ResourceArn, ResourceTagKeys; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return cost_explorer(
+        "UntagResource",
+        Dict{String,Any}(
+            "ResourceArn" => ResourceArn, "ResourceTagKeys" => ResourceTagKeys
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function untag_resource(
+    ResourceArn,
+    ResourceTagKeys,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return cost_explorer(
+        "UntagResource",
+        Dict{String,Any}(
+            mergewith(
+                _merge,
+                Dict{String,Any}(
+                    "ResourceArn" => ResourceArn, "ResourceTagKeys" => ResourceTagKeys
+                ),
+                params,
+            ),
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     update_anomaly_monitor(monitor_arn)
     update_anomaly_monitor(monitor_arn, params::Dict{String,<:Any})
 
 Updates an existing cost anomaly monitor. The changes made are applied going forward, and
-doesn'tt change anomalies detected in the past.
+doesn't change anomalies detected in the past.
 
 # Arguments
 - `monitor_arn`: Cost anomaly monitor Amazon Resource Names (ARNs).

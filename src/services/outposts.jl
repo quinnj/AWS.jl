@@ -101,7 +101,11 @@ Creates an Outpost. You can specify AvailabilityZone or AvailabilityZoneId.
 
 # Arguments
 - `name`:
-- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.
+- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.   In requests, Amazon
+  Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts and
+  sites throughout the Outposts Query API. To address backwards compatibility, the parameter
+  names OutpostID or SiteID remain in use. Despite the parameter name, you can make the
+  request with an ARN.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -189,7 +193,11 @@ end
 Deletes the Outpost.
 
 # Arguments
-- `outpost_id`:  The ID or the Amazon Resource Name (ARN) of the Outpost.
+- `outpost_id`:  The ID or the Amazon Resource Name (ARN) of the Outpost.   In requests,
+  Amazon Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts
+  and sites throughout the Outposts Query API. To address backwards compatibility, the
+  parameter names OutpostID or SiteID remain in use. Despite the parameter name, you can make
+  the request with an ARN.
 
 """
 function delete_outpost(OutpostId; aws_config::AbstractAWSConfig=global_aws_config())
@@ -221,7 +229,11 @@ end
 Deletes the site.
 
 # Arguments
-- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.
+- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.   In requests, Amazon
+  Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts and
+  sites throughout the Outposts Query API. To address backwards compatibility, the parameter
+  names OutpostID or SiteID remain in use. Despite the parameter name, you can make the
+  request with an ARN.
 
 """
 function delete_site(SiteId; aws_config::AbstractAWSConfig=global_aws_config())
@@ -307,7 +319,11 @@ end
 Gets information about the specified Outpost.
 
 # Arguments
-- `outpost_id`:  The ID or the Amazon Resource Name (ARN) of the Outpost.
+- `outpost_id`:  The ID or the Amazon Resource Name (ARN) of the Outpost.   In requests,
+  Amazon Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts
+  and sites throughout the Outposts Query API. To address backwards compatibility, the
+  parameter names OutpostID or SiteID remain in use. Despite the parameter name, you can make
+  the request with an ARN.
 
 """
 function get_outpost(OutpostId; aws_config::AbstractAWSConfig=global_aws_config())
@@ -336,10 +352,14 @@ end
     get_outpost_instance_types(outpost_id)
     get_outpost_instance_types(outpost_id, params::Dict{String,<:Any})
 
-Lists the instance types for the specified Outpost.
+Gets the instance types for the specified Outpost.
 
 # Arguments
-- `outpost_id`:  The ID or the Amazon Resource Name (ARN) of the Outpost.
+- `outpost_id`:  The ID or the Amazon Resource Name (ARN) of the Outpost.   In requests,
+  Amazon Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts
+  and sites throughout the Outposts Query API. To address backwards compatibility, the
+  parameter names OutpostID or SiteID remain in use. Despite the parameter name, you can make
+  the request with an ARN.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -377,7 +397,11 @@ end
  Gets information about the specified Outpost site.
 
 # Arguments
-- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.
+- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.   In requests, Amazon
+  Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts and
+  sites throughout the Outposts Query API. To address backwards compatibility, the parameter
+  names OutpostID or SiteID remain in use. Despite the parameter name, you can make the
+  request with an ARN.
 
 """
 function get_site(SiteId; aws_config::AbstractAWSConfig=global_aws_config())
@@ -405,7 +429,11 @@ end
 
 # Arguments
 - `address_type`:  The type of the address you request.
-- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.
+- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.   In requests, Amazon
+  Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts and
+  sites throughout the Outposts Query API. To address backwards compatibility, the parameter
+  names OutpostID or SiteID remain in use. Despite the parameter name, you can make the
+  request with an ARN.
 
 """
 function get_site_address(
@@ -437,13 +465,55 @@ function get_site_address(
 end
 
 """
+    list_assets(outpost_id)
+    list_assets(outpost_id, params::Dict{String,<:Any})
+
+ Lists the hardware assets in an Outpost. If you are using Dedicated Hosts on Amazon Web
+Services Outposts, you can filter your request by host ID to return a list of hardware
+assets that allocate resources for Dedicated Hosts.
+
+# Arguments
+- `outpost_id`:  The ID or the Amazon Resource Name (ARN) of the Outpost.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"HostIdFilter"`:  A filter for the host ID of Dedicated Hosts on the Outpost.  Filter
+  values are case sensitive. If you specify multiple values for a filter, the values are
+  joined with an OR, and the request returns all results that match any of the specified
+  values.
+- `"MaxResults"`:
+- `"NextToken"`:
+"""
+function list_assets(OutpostId; aws_config::AbstractAWSConfig=global_aws_config())
+    return outposts(
+        "GET",
+        "/outposts/$(OutpostId)/assets";
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function list_assets(
+    OutpostId,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return outposts(
+        "GET",
+        "/outposts/$(OutpostId)/assets",
+        params;
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     list_catalog_items()
     list_catalog_items(params::Dict{String,<:Any})
 
-Use to create a list of every item in the catalog. Add filters to your request to return a
-more specific list of results. Use filters to match an item class, storage option, or EC2
-family.  If you specify multiple filters, the filters are joined with an AND, and the
-request returns only results that match all of the specified filters.
+Lists the items in the catalog. Add filters to your request to return a more specific list
+of results. Use filters to match an item class, storage option, or EC2 family.  If you
+specify multiple filters, the filters are joined with an AND, and the request returns only
+results that match all of the specified filters.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -482,8 +552,8 @@ end
     list_orders()
     list_orders(params::Dict{String,<:Any})
 
-Create a list of the Outpost orders for your Amazon Web Services account. You can filter
-your request by Outpost to return a more specific list of results.
+Lists the Outpost orders for your Amazon Web Services account. You can filter your request
+by Outpost to return a more specific list of results.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -512,11 +582,11 @@ end
     list_outposts()
     list_outposts(params::Dict{String,<:Any})
 
-Create a list of the Outposts for your Amazon Web Services account. Add filters to your
-request to return a more specific list of results. Use filters to match an Outpost
-lifecycle status, Availability Zone (us-east-1a), and AZ ID (use1-az1).  If you specify
-multiple filters, the filters are joined with an AND, and the request returns only results
-that match all of the specified filters.
+Lists the Outposts for your Amazon Web Services account. Add filters to your request to
+return a more specific list of results. Use filters to match an Outpost lifecycle status,
+Availability Zone (us-east-1a), and AZ ID (use1-az1).  If you specify multiple filters, the
+filters are joined with an AND, and the request returns only results that match all of the
+specified filters.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -552,12 +622,28 @@ end
     list_sites()
     list_sites(params::Dict{String,<:Any})
 
-Lists the sites for your Amazon Web Services account.
+Lists the Outpost sites for your Amazon Web Services account. Add operating address filters
+to your request to return a more specific list of results. Use filters to match site city,
+country code, or state/region of the operating address.  If you specify multiple filters,
+the filters are joined with an AND, and the request returns only results that match all of
+the specified filters.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"MaxResults"`:
 - `"NextToken"`:
+- `"OperatingAddressCityFilter"`:  A filter for the city of the Outpost site.  Filter
+  values are case sensitive. If you specify multiple values for a filter, the values are
+  joined with an OR, and the request returns all results that match any of the specified
+  values.
+- `"OperatingAddressCountryCodeFilter"`:  A filter for the country code of the Outpost
+  site.  Filter values are case sensitive. If you specify multiple values for a filter, the
+  values are joined with an OR, and the request returns all results that match any of the
+  specified values.
+- `"OperatingAddressStateOrRegionFilter"`:  A filter for the state/region of the Outpost
+  site.  Filter values are case sensitive. If you specify multiple values for a filter, the
+  values are joined with an OR, and the request returns all results that match any of the
+  specified values.
 """
 function list_sites(; aws_config::AbstractAWSConfig=global_aws_config())
     return outposts("GET", "/sites"; aws_config=aws_config, feature_set=SERVICE_FEATURE_SET)
@@ -683,7 +769,11 @@ end
  Updates an Outpost.
 
 # Arguments
-- `outpost_id`:  The ID or the Amazon Resource Name (ARN) of the Outpost.
+- `outpost_id`:  The ID or the Amazon Resource Name (ARN) of the Outpost.   In requests,
+  Amazon Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts
+  and sites throughout the Outposts Query API. To address backwards compatibility, the
+  parameter names OutpostID or SiteID remain in use. Despite the parameter name, you can make
+  the request with an ARN.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -720,7 +810,11 @@ end
  Updates the site.
 
 # Arguments
-- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.
+- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.   In requests, Amazon
+  Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts and
+  sites throughout the Outposts Query API. To address backwards compatibility, the parameter
+  names OutpostID or SiteID remain in use. Despite the parameter name, you can make the
+  request with an ARN.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -757,7 +851,11 @@ been deactivated.
 # Arguments
 - `address`:  The address for the site.
 - `address_type`:  The type of the address.
-- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.
+- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.   In requests, Amazon
+  Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts and
+  sites throughout the Outposts Query API. To address backwards compatibility, the parameter
+  names OutpostID or SiteID remain in use. Despite the parameter name, you can make the
+  request with an ARN.
 
 """
 function update_site_address(
@@ -803,7 +901,11 @@ Outposts User Guide.  To update a rack at a site with an order of IN_PROGRESS, y
 wait for the order to complete or cancel the order.
 
 # Arguments
-- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.
+- `site_id`:  The ID or the Amazon Resource Name (ARN) of the site.   In requests, Amazon
+  Web Services Outposts accepts the Amazon Resource Name (ARN) or an ID for Outposts and
+  sites throughout the Outposts Query API. To address backwards compatibility, the parameter
+  names OutpostID or SiteID remain in use. Despite the parameter name, you can make the
+  request with an ARN.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:

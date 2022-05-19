@@ -350,6 +350,37 @@ function batch_get_crawlers(
 end
 
 """
+    batch_get_custom_entity_types(names)
+    batch_get_custom_entity_types(names, params::Dict{String,<:Any})
+
+Retrieves the details for the custom patterns specified by a list of names.
+
+# Arguments
+- `names`: A list of names of the custom patterns that you want to retrieve.
+
+"""
+function batch_get_custom_entity_types(
+    Names; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "BatchGetCustomEntityTypes",
+        Dict{String,Any}("Names" => Names);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function batch_get_custom_entity_types(
+    Names, params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "BatchGetCustomEntityTypes",
+        Dict{String,Any}(mergewith(_merge, Dict{String,Any}("Names" => Names), params));
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     batch_get_dev_endpoints(dev_endpoint_names)
     batch_get_dev_endpoints(dev_endpoint_names, params::Dict{String,<:Any})
 
@@ -699,6 +730,46 @@ function cancel_mltask_run(
 end
 
 """
+    cancel_statement(id, session_id)
+    cancel_statement(id, session_id, params::Dict{String,<:Any})
+
+Cancels the statement..
+
+# Arguments
+- `id`: The ID of the statement to be cancelled.
+- `session_id`: The Session ID of the statement to be cancelled.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"RequestOrigin"`: The origin of the request to cancel the statement.
+"""
+function cancel_statement(Id, SessionId; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue(
+        "CancelStatement",
+        Dict{String,Any}("Id" => Id, "SessionId" => SessionId);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function cancel_statement(
+    Id,
+    SessionId,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return glue(
+        "CancelStatement",
+        Dict{String,Any}(
+            mergewith(
+                _merge, Dict{String,Any}("Id" => Id, "SessionId" => SessionId), params
+            ),
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     check_schema_version_validity(data_format, schema_definition)
     check_schema_version_validity(data_format, schema_definition, params::Dict{String,<:Any})
 
@@ -707,8 +778,8 @@ supplied schema using DataFormat as the format. Since it does not take a schema 
 no compatibility checks are performed.
 
 # Arguments
-- `data_format`: The data format of the schema definition. Currently AVRO and JSON are
-  supported.
+- `data_format`: The data format of the schema definition. Currently AVRO, JSON and
+  PROTOBUF are supported.
 - `schema_definition`: The definition of the schema that has to be validated.
 
 """
@@ -930,6 +1001,57 @@ function create_crawler(
 end
 
 """
+    create_custom_entity_type(name, regex_string)
+    create_custom_entity_type(name, regex_string, params::Dict{String,<:Any})
+
+Creates a custom pattern that is used to detect sensitive data across the columns and rows
+of your structured data. Each custom pattern you create specifies a regular expression and
+an optional list of context words. If no context words are passed only a regular expression
+is checked.
+
+# Arguments
+- `name`: A name for the custom pattern that allows it to be retrieved or deleted later.
+  This name must be unique per Amazon Web Services account.
+- `regex_string`: A regular expression string that is used for detecting sensitive data in
+  a custom pattern.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"ContextWords"`: A list of context words. If none of these context words are found
+  within the vicinity of the regular expression the data will not be detected as sensitive
+  data. If no context words are passed only a regular expression is checked.
+"""
+function create_custom_entity_type(
+    Name, RegexString; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "CreateCustomEntityType",
+        Dict{String,Any}("Name" => Name, "RegexString" => RegexString);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function create_custom_entity_type(
+    Name,
+    RegexString,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return glue(
+        "CreateCustomEntityType",
+        Dict{String,Any}(
+            mergewith(
+                _merge,
+                Dict{String,Any}("Name" => Name, "RegexString" => RegexString),
+                params,
+            ),
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     create_database(database_input)
     create_database(database_input, params::Dict{String,<:Any})
 
@@ -1075,6 +1197,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   100 DPUs; the default is 10. A DPU is a relative measure of processing power that consists
   of 4 vCPUs of compute capacity and 16 GB of memory. For more information, see the Glue
   pricing page.
+- `"CodeGenConfigurationNodes"`: The representation of a directed acyclic graph on which
+  both the Glue Studio visual component and Glue Studio code generation is based.
 - `"Connections"`: The connections used for this job.
 - `"DefaultArguments"`: The default arguments for this job. You can specify arguments here
   that your own job-execution script consumes, as well as arguments that Glue itself
@@ -1444,8 +1568,8 @@ used. When this API is called without a RegistryId, this will create an entry fo
 \"default-registry\" in the registry database tables, if it is not already present.
 
 # Arguments
-- `data_format`: The data format of the schema definition. Currently AVRO and JSON are
-  supported.
+- `data_format`: The data format of the schema definition. Currently AVRO, JSON and
+  PROTOBUF are supported.
 - `schema_name`: Name of the schema to be created of max length of 255, and may only
   contain letters, numbers, hyphen, underscore, dollar sign, or hash mark. No whitespace.
 
@@ -1581,6 +1705,67 @@ function create_security_configuration(
                 Dict{String,Any}(
                     "EncryptionConfiguration" => EncryptionConfiguration, "Name" => Name
                 ),
+                params,
+            ),
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    create_session(command, id, role)
+    create_session(command, id, role, params::Dict{String,<:Any})
+
+Creates a new session.
+
+# Arguments
+- `command`: The SessionCommand that runs the job.
+- `id`: The ID of the session request.
+- `role`: The IAM Role ARN
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"Connections"`: The number of connections to use for the session.
+- `"DefaultArguments"`: A map array of key-value pairs. Max is 75 pairs.
+- `"Description"`: The description of the session.
+- `"GlueVersion"`: The Glue version determines the versions of Apache Spark and Python that
+  AWS Glue supports. The GlueVersion must be greater than 2.0.
+- `"IdleTimeout"`: The number of seconds when idle before request times out.
+- `"MaxCapacity"`: The number of AWS Glue data processing units (DPUs) that can be
+  allocated when the job runs. A DPU is a relative measure of processing power that consists
+  of 4 vCPUs of compute capacity and 16 GB memory.
+- `"NumberOfWorkers"`: The number of workers to use for the session.
+- `"RequestOrigin"`: The origin of the request.
+- `"SecurityConfiguration"`: The name of the SecurityConfiguration structure to be used
+  with the session
+- `"Tags"`: The map of key value pairs (tags) belonging to the session.
+- `"Timeout"`: The number of seconds before request times out.
+- `"WorkerType"`: The Worker Type. Can be one of G.1X, G.2X, Standard
+"""
+function create_session(
+    Command, Id, Role; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "CreateSession",
+        Dict{String,Any}("Command" => Command, "Id" => Id, "Role" => Role);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function create_session(
+    Command,
+    Id,
+    Role,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return glue(
+        "CreateSession",
+        Dict{String,Any}(
+            mergewith(
+                _merge,
+                Dict{String,Any}("Command" => Command, "Id" => Id, "Role" => Role),
                 params,
             ),
         );
@@ -2034,6 +2219,35 @@ function delete_crawler(
 end
 
 """
+    delete_custom_entity_type(name)
+    delete_custom_entity_type(name, params::Dict{String,<:Any})
+
+Deletes a custom pattern by specifying its name.
+
+# Arguments
+- `name`: The name of the custom pattern that you want to delete.
+
+"""
+function delete_custom_entity_type(Name; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue(
+        "DeleteCustomEntityType",
+        Dict{String,Any}("Name" => Name);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function delete_custom_entity_type(
+    Name, params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "DeleteCustomEntityType",
+        Dict{String,Any}(mergewith(_merge, Dict{String,Any}("Name" => Name), params));
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     delete_database(name)
     delete_database(name, params::Dict{String,<:Any})
 
@@ -2472,6 +2686,38 @@ function delete_security_configuration(
     return glue(
         "DeleteSecurityConfiguration",
         Dict{String,Any}(mergewith(_merge, Dict{String,Any}("Name" => Name), params));
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    delete_session(id)
+    delete_session(id, params::Dict{String,<:Any})
+
+Deletes the session.
+
+# Arguments
+- `id`: The ID of the session to be deleted.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"RequestOrigin"`: The name of the origin of the delete session request.
+"""
+function delete_session(Id; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue(
+        "DeleteSession",
+        Dict{String,Any}("Id" => Id);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function delete_session(
+    Id, params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "DeleteSession",
+        Dict{String,Any}(mergewith(_merge, Dict{String,Any}("Id" => Id), params));
         aws_config=aws_config,
         feature_set=SERVICE_FEATURE_SET,
     )
@@ -3141,6 +3387,35 @@ function get_crawlers(
 )
     return glue(
         "GetCrawlers", params; aws_config=aws_config, feature_set=SERVICE_FEATURE_SET
+    )
+end
+
+"""
+    get_custom_entity_type(name)
+    get_custom_entity_type(name, params::Dict{String,<:Any})
+
+Retrieves the details of a custom pattern by specifying its name.
+
+# Arguments
+- `name`: The name of the custom pattern that you want to retrieve.
+
+"""
+function get_custom_entity_type(Name; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue(
+        "GetCustomEntityType",
+        Dict{String,Any}("Name" => Name);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function get_custom_entity_type(
+    Name, params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "GetCustomEntityType",
+        Dict{String,Any}(mergewith(_merge, Dict{String,Any}("Name" => Name), params));
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
     )
 end
 
@@ -4214,6 +4489,78 @@ function get_security_configurations(
 end
 
 """
+    get_session(id)
+    get_session(id, params::Dict{String,<:Any})
+
+Retrieves the session.
+
+# Arguments
+- `id`: The ID of the session.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"RequestOrigin"`: The origin of the request.
+"""
+function get_session(Id; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue(
+        "GetSession",
+        Dict{String,Any}("Id" => Id);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function get_session(
+    Id, params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "GetSession",
+        Dict{String,Any}(mergewith(_merge, Dict{String,Any}("Id" => Id), params));
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    get_statement(id, session_id)
+    get_statement(id, session_id, params::Dict{String,<:Any})
+
+Retrieves the statement.
+
+# Arguments
+- `id`: The Id of the statement.
+- `session_id`: The Session ID of the statement.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"RequestOrigin"`: The origin of the request.
+"""
+function get_statement(Id, SessionId; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue(
+        "GetStatement",
+        Dict{String,Any}("Id" => Id, "SessionId" => SessionId);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function get_statement(
+    Id,
+    SessionId,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return glue(
+        "GetStatement",
+        Dict{String,Any}(
+            mergewith(
+                _merge, Dict{String,Any}("Id" => Id, "SessionId" => SessionId), params
+            ),
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     get_table(database_name, name)
     get_table(database_name, name, params::Dict{String,<:Any})
 
@@ -4992,6 +5339,33 @@ function list_crawlers(
 end
 
 """
+    list_custom_entity_types()
+    list_custom_entity_types(params::Dict{String,<:Any})
+
+Lists all the custom patterns that have been created.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"MaxResults"`: The maximum number of results to return.
+- `"NextToken"`: A paginated token to offset the results.
+"""
+function list_custom_entity_types(; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue(
+        "ListCustomEntityTypes"; aws_config=aws_config, feature_set=SERVICE_FEATURE_SET
+    )
+end
+function list_custom_entity_types(
+    params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "ListCustomEntityTypes",
+        params;
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     list_dev_endpoints()
     list_dev_endpoints(params::Dict{String,<:Any})
 
@@ -5165,6 +5539,68 @@ function list_schemas(
 )
     return glue(
         "ListSchemas", params; aws_config=aws_config, feature_set=SERVICE_FEATURE_SET
+    )
+end
+
+"""
+    list_sessions()
+    list_sessions(params::Dict{String,<:Any})
+
+Retrieve a session..
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"MaxResults"`: The maximum number of results.
+- `"NextToken"`: The token for the next set of results, or null if there are no more
+  result.
+- `"RequestOrigin"`: The origin of the request.
+- `"Tags"`: Tags belonging to the session.
+"""
+function list_sessions(; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue("ListSessions"; aws_config=aws_config, feature_set=SERVICE_FEATURE_SET)
+end
+function list_sessions(
+    params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "ListSessions", params; aws_config=aws_config, feature_set=SERVICE_FEATURE_SET
+    )
+end
+
+"""
+    list_statements(session_id)
+    list_statements(session_id, params::Dict{String,<:Any})
+
+Lists statements for the session.
+
+# Arguments
+- `session_id`: The Session ID of the statements.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"NextToken"`:
+- `"RequestOrigin"`: The origin of the request to list statements.
+"""
+function list_statements(SessionId; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue(
+        "ListStatements",
+        Dict{String,Any}("SessionId" => SessionId);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function list_statements(
+    SessionId,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return glue(
+        "ListStatements",
+        Dict{String,Any}(
+            mergewith(_merge, Dict{String,Any}("SessionId" => SessionId), params)
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
     )
 end
 
@@ -5610,6 +6046,46 @@ function resume_workflow_run(
                 _merge,
                 Dict{String,Any}("Name" => Name, "NodeIds" => NodeIds, "RunId" => RunId),
                 params,
+            ),
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    run_statement(code, session_id)
+    run_statement(code, session_id, params::Dict{String,<:Any})
+
+Executes the statement.
+
+# Arguments
+- `code`: The statement code to be run.
+- `session_id`: The Session Id of the statement to be run.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"RequestOrigin"`: The origin of the request.
+"""
+function run_statement(Code, SessionId; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue(
+        "RunStatement",
+        Dict{String,Any}("Code" => Code, "SessionId" => SessionId);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function run_statement(
+    Code,
+    SessionId,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return glue(
+        "RunStatement",
+        Dict{String,Any}(
+            mergewith(
+                _merge, Dict{String,Any}("Code" => Code, "SessionId" => SessionId), params
             ),
         );
         aws_config=aws_config,
@@ -6089,6 +6565,9 @@ Starts a new run of the specified workflow.
 # Arguments
 - `name`: The name of the workflow to start.
 
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"RunProperties"`: The workflow run properties for the new workflow run.
 """
 function start_workflow_run(Name; aws_config::AbstractAWSConfig=global_aws_config())
     return glue(
@@ -6169,6 +6648,38 @@ function stop_crawler_schedule(
         Dict{String,Any}(
             mergewith(_merge, Dict{String,Any}("CrawlerName" => CrawlerName), params)
         );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    stop_session(id)
+    stop_session(id, params::Dict{String,<:Any})
+
+Stops the session.
+
+# Arguments
+- `id`: The ID of the session to be stopped.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"RequestOrigin"`: The origin of the request.
+"""
+function stop_session(Id; aws_config::AbstractAWSConfig=global_aws_config())
+    return glue(
+        "StopSession",
+        Dict{String,Any}("Id" => Id);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function stop_session(
+    Id, params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return glue(
+        "StopSession",
+        Dict{String,Any}(mergewith(_merge, Dict{String,Any}("Id" => Id), params));
         aws_config=aws_config,
         feature_set=SERVICE_FEATURE_SET,
     )
@@ -7039,6 +7550,7 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   before updating it. However, if skipArchive is set to true, UpdateTable does not create the
   archived version.
 - `"TransactionId"`: The transaction ID at which to update the table contents.
+- `"VersionId"`:
 """
 function update_table(
     DatabaseName, TableInput; aws_config::AbstractAWSConfig=global_aws_config()

@@ -5,8 +5,8 @@ using AWS.Compat
 using AWS.UUIDs
 
 """
-    create_dataset(client_token, dataset_name, dataset_schema)
-    create_dataset(client_token, dataset_name, dataset_schema, params::Dict{String,<:Any})
+    create_dataset(client_token, dataset_name)
+    create_dataset(client_token, dataset_name, params::Dict{String,<:Any})
 
 Creates a container for a collection of data being ingested for analysis. The dataset
 contains the metadata describing where the data is and what the data actually looks like.
@@ -17,28 +17,21 @@ information. A dataset also contains any tags associated with the ingested data.
 - `client_token`:  A unique identifier for the request. If you do not set the client
   request token, Amazon Lookout for Equipment generates one.
 - `dataset_name`: The name of the dataset being created.
-- `dataset_schema`: A JSON description of the data that is in each time series dataset,
-  including names, column names, and data types.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"DatasetSchema"`: A JSON description of the data that is in each time series dataset,
+  including names, column names, and data types.
 - `"ServerSideKmsKeyId"`: Provides the identifier of the KMS key used to encrypt dataset
   data by Amazon Lookout for Equipment.
 - `"Tags"`: Any tags associated with the ingested data described in the dataset.
 """
 function create_dataset(
-    ClientToken,
-    DatasetName,
-    DatasetSchema;
-    aws_config::AbstractAWSConfig=global_aws_config(),
+    ClientToken, DatasetName; aws_config::AbstractAWSConfig=global_aws_config()
 )
     return lookoutequipment(
         "CreateDataset",
-        Dict{String,Any}(
-            "ClientToken" => ClientToken,
-            "DatasetName" => DatasetName,
-            "DatasetSchema" => DatasetSchema,
-        );
+        Dict{String,Any}("ClientToken" => ClientToken, "DatasetName" => DatasetName);
         aws_config=aws_config,
         feature_set=SERVICE_FEATURE_SET,
     )
@@ -46,7 +39,6 @@ end
 function create_dataset(
     ClientToken,
     DatasetName,
-    DatasetSchema,
     params::AbstractDict{String};
     aws_config::AbstractAWSConfig=global_aws_config(),
 )
@@ -56,9 +48,7 @@ function create_dataset(
             mergewith(
                 _merge,
                 Dict{String,Any}(
-                    "ClientToken" => ClientToken,
-                    "DatasetName" => DatasetName,
-                    "DatasetSchema" => DatasetSchema,
+                    "ClientToken" => ClientToken, "DatasetName" => DatasetName
                 ),
                 params,
             ),
@@ -371,7 +361,7 @@ end
     describe_data_ingestion_job(job_id, params::Dict{String,<:Any})
 
 Provides information on a specific data ingestion job such as creation time, dataset ARN,
-status, and so on.
+and status.
 
 # Arguments
 - `job_id`: The job ID of the data ingestion job.
@@ -402,8 +392,8 @@ end
     describe_dataset(dataset_name)
     describe_dataset(dataset_name, params::Dict{String,<:Any})
 
-Provides a JSON description of the data that is in each time series dataset, including
-names, column names, and data types.
+Provides a JSON description of the data in each time series dataset, including names,
+column names, and data types.
 
 # Arguments
 - `dataset_name`: The name of the dataset to be described.
@@ -672,6 +662,52 @@ function list_models(
 )
     return lookoutequipment(
         "ListModels", params; aws_config=aws_config, feature_set=SERVICE_FEATURE_SET
+    )
+end
+
+"""
+    list_sensor_statistics(dataset_name)
+    list_sensor_statistics(dataset_name, params::Dict{String,<:Any})
+
+ Lists statistics about the data collected for each of the sensors that have been
+successfully ingested in the particular dataset. Can also be used to retreive Sensor
+Statistics for a previous ingestion job.
+
+# Arguments
+- `dataset_name`:  The name of the dataset associated with the list of Sensor Statistics.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"IngestionJobId"`:  The ingestion job id associated with the list of Sensor Statistics.
+  To get sensor statistics for a particular ingestion job id, both dataset name and ingestion
+  job id must be submitted as inputs.
+- `"MaxResults"`:  Specifies the maximum number of sensors for which to retrieve
+  statistics.
+- `"NextToken"`:  An opaque pagination token indicating where to continue the listing of
+  sensor statistics.
+"""
+function list_sensor_statistics(
+    DatasetName; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return lookoutequipment(
+        "ListSensorStatistics",
+        Dict{String,Any}("DatasetName" => DatasetName);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function list_sensor_statistics(
+    DatasetName,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return lookoutequipment(
+        "ListSensorStatistics",
+        Dict{String,Any}(
+            mergewith(_merge, Dict{String,Any}("DatasetName" => DatasetName), params)
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
     )
 end
 

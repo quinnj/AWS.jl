@@ -566,7 +566,11 @@ end
     get_experiment_results(experiment, metric_names, project, treatment_names)
     get_experiment_results(experiment, metric_names, project, treatment_names, params::Dict{String,<:Any})
 
-Retrieves the results of a running or completed experiment.
+Retrieves the results of a running or completed experiment. No results are available until
+there have been 100 events for each variation and at least 10 minutes have passed since the
+start of the experiment. Experiment results are available up to 63 days after the start of
+the experiment. They are not available after that because of CloudWatch data retention
+policies.
 
 # Arguments
 - `experiment`: The name of the experiment to retrieve the results of.
@@ -580,7 +584,8 @@ Retrieves the results of a running or completed experiment.
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"baseStat"`: The statistic used to calculate experiment results. Currently the only
   valid value is mean, which uses the mean of the collected values as the statistic.
-- `"endTime"`: The date and time that the experiment ended, if it is completed.
+- `"endTime"`: The date and time that the experiment ended, if it is completed. This must
+  be no longer than 30 days after the experiment start time.
 - `"period"`: In seconds, the amount of time to aggregate results together.
 - `"reportNames"`: The names of the report types that you want to see. Currently,
   BayesianInference is the only valid value.
@@ -754,6 +759,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"maxResults"`: The maximum number of results to include in the response.
 - `"nextToken"`: The token to use when requesting the next set of results. You received
   this token from a previous ListExperiments operation.
+- `"status"`: Use this optional parameter to limit the returned results to only the
+  experiments with the status that you specify here.
 """
 function list_experiments(project; aws_config::AbstractAWSConfig=global_aws_config())
     return evidently(
@@ -824,6 +831,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"maxResults"`: The maximum number of results to include in the response.
 - `"nextToken"`: The token to use when requesting the next set of results. You received
   this token from a previous ListLaunches operation.
+- `"status"`: Use this optional parameter to limit the returned results to only the
+  launches with the status that you specify here.
 """
 function list_launches(project; aws_config::AbstractAWSConfig=global_aws_config())
     return evidently(
@@ -950,7 +959,8 @@ end
 Starts an existing experiment. To create an experiment, use CreateExperiment.
 
 # Arguments
-- `analysis_complete_time`: The date and time to end the experiment.
+- `analysis_complete_time`: The date and time to end the experiment. This must be no more
+  than 30 days after the experiment starts.
 - `experiment`: The name of the experiment to start.
 - `project`: The name or ARN of the project that contains the experiment to start.
 

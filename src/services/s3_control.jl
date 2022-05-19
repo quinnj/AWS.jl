@@ -200,8 +200,8 @@ function create_bucket(
 end
 
 """
-    create_job(client_request_token, manifest, operation, priority, report, role_arn, x-amz-account-id)
-    create_job(client_request_token, manifest, operation, priority, report, role_arn, x-amz-account-id, params::Dict{String,<:Any})
+    create_job(client_request_token, operation, priority, report, role_arn, x-amz-account-id)
+    create_job(client_request_token, operation, priority, report, role_arn, x-amz-account-id, params::Dict{String,<:Any})
 
 You can use S3 Batch Operations to perform large-scale batch actions on Amazon S3 objects.
 Batch Operations can run a single action on lists of Amazon S3 objects that you specify.
@@ -212,7 +212,6 @@ creates a S3 Batch Operations job.  Related actions include:    DescribeJob     
 # Arguments
 - `client_request_token`: An idempotency token to ensure that you don't accidentally submit
   the same request twice. You can use any string up to the maximum length.
-- `manifest`: Configuration parameters for the manifest.
 - `operation`: The action that you want this job to perform on every object listed in the
   manifest. For more information about the available actions, see Operations in the Amazon S3
   User Guide.
@@ -229,12 +228,14 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   runs the job. Confirmation is only required for jobs created through the Amazon S3 console.
 - `"Description"`: A description for this job. You can use any string within the permitted
   length. Descriptions don't need to be unique and can be used for multiple jobs.
+- `"Manifest"`: Configuration parameters for the manifest.
+- `"ManifestGenerator"`: The attribute container for the ManifestGenerator details. Jobs
+  must be created with either a manifest file or a ManifestGenerator, but not both.
 - `"Tags"`: A set of tags to associate with the S3 Batch Operations job. This is an
   optional parameter.
 """
 function create_job(
     ClientRequestToken,
-    Manifest,
     Operation,
     Priority,
     Report,
@@ -247,7 +248,6 @@ function create_job(
         "/v20180820/jobs",
         Dict{String,Any}(
             "ClientRequestToken" => ClientRequestToken,
-            "Manifest" => Manifest,
             "Operation" => Operation,
             "Priority" => Priority,
             "Report" => Report,
@@ -260,7 +260,6 @@ function create_job(
 end
 function create_job(
     ClientRequestToken,
-    Manifest,
     Operation,
     Priority,
     Report,
@@ -277,7 +276,6 @@ function create_job(
                 _merge,
                 Dict{String,Any}(
                     "ClientRequestToken" => ClientRequestToken,
-                    "Manifest" => Manifest,
                     "Operation" => Operation,
                     "Priority" => Priority,
                     "Report" => Report,
@@ -2332,12 +2330,12 @@ end
     list_access_points_for_object_lambda(x-amz-account-id)
     list_access_points_for_object_lambda(x-amz-account-id, params::Dict{String,<:Any})
 
-Returns a list of the access points associated with the Object Lambda Access Point. You can
-retrieve up to 1000 access points per call. If there are more than 1,000 access points (or
-the number specified in maxResults, whichever is less), the response will include a
-continuation token that you can use to list the additional access points. The following
-actions are related to ListAccessPointsForObjectLambda:    CreateAccessPointForObjectLambda
-    DeleteAccessPointForObjectLambda     GetAccessPointForObjectLambda
+Returns some or all (up to 1,000) access points associated with the Object Lambda Access
+Point per call. If there are more access points than what can be returned in one call, the
+response will include a continuation token that you can use to list the additional access
+points. The following actions are related to ListAccessPointsForObjectLambda:
+CreateAccessPointForObjectLambda     DeleteAccessPointForObjectLambda
+GetAccessPointForObjectLambda
 
 # Arguments
 - `x-amz-account-id`: The account ID for the account that owns the specified Object Lambda
@@ -2346,9 +2344,9 @@ actions are related to ListAccessPointsForObjectLambda:    CreateAccessPointForO
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"maxResults"`: The maximum number of access points that you want to include in the list.
-  If there are more than this number of access points, then the response will include a
-  continuation token in the NextToken field that you can use to retrieve the next page of
-  access points.
+  The response may contain fewer access points but will never contain more. If there are more
+  than this number of access points, then the response will include a continuation token in
+  the NextToken field that you can use to retrieve the next page of access points.
 - `"nextToken"`: If the list has more access points than can be returned in one call to
   this API, this field contains a continuation token that you can provide in subsequent calls
   to this API to retrieve additional access points.
@@ -3044,7 +3042,7 @@ length, and tag values can be up to 256 Unicode characters in length.   The key 
 are case sensitive.   For tagging-related restrictions related to characters and encodings,
 see User-Defined Tag Restrictions in the Billing and Cost Management User Guide.       To
 use this action, you must have permission to perform the s3:PutJobTagging action. Related
-actions include:    CreatJob     GetJobTagging     DeleteJobTagging
+actions include:    CreateJob     GetJobTagging     DeleteJobTagging
 
 # Arguments
 - `tags`: The set of tags to associate with the S3 Batch Operations job.
@@ -3163,7 +3161,8 @@ end
     put_public_access_block(public_access_block_configuration, x-amz-account-id, params::Dict{String,<:Any})
 
 Creates or modifies the PublicAccessBlock configuration for an Amazon Web Services account.
-For more information, see  Using Amazon S3 block public access. Related actions include:
+For this operation, users must have the s3:PutBucketPublicAccessBlock permission. For more
+information, see  Using Amazon S3 block public access. Related actions include:
 GetPublicAccessBlock     DeletePublicAccessBlock
 
 # Arguments

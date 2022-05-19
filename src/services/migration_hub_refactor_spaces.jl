@@ -10,8 +10,9 @@ using AWS.UUIDs
 
 Creates an Amazon Web Services Migration Hub Refactor Spaces application. The account that
 owns the environment also owns the applications created inside the environment, regardless
-of the account that creates the application. Refactor Spaces provisions the Amazon API
-Gateway and Network Load Balancer for the application proxy inside your account.
+of the account that creates the application. Refactor Spaces provisions an Amazon API
+Gateway, API Gateway VPC link, and Network Load Balancer for the application proxy inside
+your account.
 
 # Arguments
 - `environment_identifier`: The unique identifier of the environment.
@@ -81,7 +82,8 @@ end
     create_environment(name, network_fabric_type, params::Dict{String,<:Any})
 
 Creates an Amazon Web Services Migration Hub Refactor Spaces environment. The caller owns
-the environment resource, and they are referred to as the environment owner. The
+the environment resource, and all Refactor Spaces applications, services, and routes
+created within the environment. They are referred to as the environment owner. The
 environment owner has cross-account visibility and control of Refactor Spaces resources
 that are added to the environment by other accounts that the environment is shared with.
 When creating an environment, Refactor Spaces provisions a transit gateway in your account.
@@ -151,7 +153,8 @@ service as follows:   If the service has a URL endpoint, and the endpoint resolv
 private IP address, Refactor Spaces routes traffic using the API Gateway VPC link.    If
 the service has a URL endpoint, and the endpoint resolves to a public IP address, Refactor
 Spaces routes traffic over the public internet.   If the service has an Lambda function
-endpoint, then Refactor Spaces uses the API Gateway Lambda integration.   A health check is
+endpoint, then Refactor Spaces configures the Lambda function's resource policy to allow
+the application's API Gateway to invoke the function.   A one-time health check is
 performed on the service when the route is created. If the health check fails, the route
 transitions to FAILED, and no traffic is sent to the service. For Lambda functions, the
 Lambda function state is checked. If the function is not active, the function configuration
@@ -164,7 +167,9 @@ HealthCheckProtocol, HealthCheckPort, and HealthCheckPath are the same protocol,
 path specified in the URL or health URL, if used. All other settings use the default
 values, as described in Health checks for your target groups. The health check is
 considered successful if at least one target within the target group transitions to a
-healthy state.
+healthy state. Services can have HTTP or HTTPS URL endpoints. For HTTPS URLs,
+publicly-signed certificates are supported. Private Certificate Authorities (CAs) are
+permitted only if the CA's domain is publicly resolvable.
 
 # Arguments
 - `application_identifier`: The ID of the application within which the route is being
@@ -238,7 +243,7 @@ end
 Creates an Amazon Web Services Migration Hub Refactor Spaces service. The account owner of
 the service is always the environment owner, regardless of which account in the environment
 creates the service. Services have either a URL endpoint in a virtual private cloud (VPC),
-or a Lambda function endpoint.  If an Amazon Web Services resourceis launched in a service
+or a Lambda function endpoint.  If an Amazon Web Services resource is launched in a service
 VPC, and you want it to be accessible to all of an environment’s services with VPCs and
 routes, apply the RefactorSpacesSecurityGroup to the resource. Alternatively, to add more
 cross-account constraints, apply your own security group.
@@ -729,8 +734,8 @@ end
     list_environment_vpcs(environment_identifier)
     list_environment_vpcs(environment_identifier, params::Dict{String,<:Any})
 
-Lists all the virtual private clouds (VPCs) that are part of an Amazon Web Services
-Migration Hub Refactor Spaces environment.
+Lists all Amazon Web Services Migration Hub Refactor Spaces service virtual private clouds
+(VPCs) that are part of the environment.
 
 # Arguments
 - `environment_identifier`: The ID of the environment.

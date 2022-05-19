@@ -8,17 +8,22 @@ using AWS.UUIDs
     create_call_analytics_category(category_name, rules)
     create_call_analytics_category(category_name, rules, params::Dict{String,<:Any})
 
-Creates an analytics category. Amazon Transcribe applies the conditions specified by your
-analytics categories to your call analytics jobs. For each analytics category, you specify
-one or more rules. For example, you can specify a rule that the customer sentiment was
-neutral or negative within that category. If you start a call analytics job, Amazon
-Transcribe applies the category to the analytics job that you've specified.
+Creates a call analytics category. Amazon Transcribe applies the conditions specified by
+your call analytics categories to your call analytics jobs. For each analytics category,
+you must create between 1 and 20 rules. For example, you can create a 'greeting' category
+with a rule that flags calls in which your agent does not use a specified phrase (for
+example: \"Please note this call may be recorded.\") in the first 15 seconds of the call.
+When you start a call analytics job, Amazon Transcribe applies all your existing call
+analytics categories to that job.
 
 # Arguments
-- `category_name`: The name that you choose for your category when you create it.
-- `rules`: To create a category, you must specify between 1 and 20 rules. For each rule,
-  you specify a filter to be applied to the attributes of the call. For example, you can
-  specify a sentiment filter to detect if the customer's sentiment was negative or neutral.
+- `category_name`: A unique name, chosen by you, for your call analytics category. For
+  example, sentiment-positive-last30seconds.
+- `rules`: Rules make up a call analytics category. When creating a call analytics
+  category, you must create between 1 and 20 rules for your category. For each rule, you
+  specify a filter you want applied to the attributes of a call. For example, you can choose
+  a sentiment filter that detects if a customer's sentiment was positive during the last 30
+  seconds of the call.
 
 """
 function create_call_analytics_category(
@@ -55,26 +60,31 @@ end
     create_language_model(base_model_name, input_data_config, language_code, model_name)
     create_language_model(base_model_name, input_data_config, language_code, model_name, params::Dict{String,<:Any})
 
-Creates a new custom language model. Use Amazon S3 prefixes to provide the location of your
-input files. The time it takes to create your model depends on the size of your training
-data.
+Creates a new custom language model. When creating a new language model, you must specify
+if you want a Wideband (audio sample rates over 16,000 Hz) or Narrowband (audio sample
+rates under 16,000 Hz) base model. You then include the S3 URI location of your training
+and tuning files, the language for the model, a unique name, and any tags you want
+associated with your model.
 
 # Arguments
-- `base_model_name`: The Amazon Transcribe standard language model, or base model used to
-  create your custom language model. If you want to use your custom language model to
-  transcribe audio with a sample rate of 16,000 Hz or greater, choose Wideband. If you want
-  to use your custom language model to transcribe audio with a sample rate that is less than
-  16,000 Hz, choose Narrowband.
-- `input_data_config`: Contains the data access role and the Amazon S3 prefixes to read the
-  required input files to create a custom language model.
-- `language_code`: The language of the input text you're using to train your custom
-  language model.
-- `model_name`: The name you choose for your custom language model when you create it.
+- `base_model_name`: The Amazon Transcribe standard language model, or base model, used to
+  create your custom language model. Amazon Transcribe offers two options for base models:
+  Wideband and Narrowband. If the audio you want to transcribe has a sample rate of 16,000 Hz
+  or greater, choose WideBand. To transcribe audio with a sample rate less than 16,000 Hz,
+  choose NarrowBand.
+- `input_data_config`: Contains your data access role ARN (Amazon Resource Name) and the
+  Amazon S3 locations of your training (S3Uri) and tuning (TuningDataS3Uri) data.
+- `language_code`: The language of your custom language model; note that the language code
+  you select must match the language of your training and tuning data.
+- `model_name`: The name of your new custom language model. This name is case sensitive,
+  cannot contain spaces, and must be unique within an Amazon Web Services account. If you try
+  to create a language model with the same name as a previous language model, you get a
+  ConflictException error.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"Tags"`: Adds one or more tags, each in the form of a key:value pair, to a new language
-  model at the time you create this new model.
+- `"Tags"`: Optionally add tags, each in the form of a key:value pair, to your new language
+  model. See also: .
 """
 function create_language_model(
     BaseModelName,
@@ -126,31 +136,31 @@ end
     create_medical_vocabulary(language_code, vocabulary_file_uri, vocabulary_name)
     create_medical_vocabulary(language_code, vocabulary_file_uri, vocabulary_name, params::Dict{String,<:Any})
 
-Creates a new custom vocabulary that you can use to modify how Amazon Transcribe Medical
-transcribes your audio file.
+Creates a new custom medical vocabulary. When creating a new medical vocabulary, you must
+upload a text file that contains your new entries, phrases, and terms into an S3 bucket.
+Note that this differs from , where you can include a list of terms within your request
+using the Phrases flag, as CreateMedicalVocabulary does not support the Phrases flag. For
+more information on creating a custom vocabulary text file, see Creating a custom
+vocabulary.
 
 # Arguments
-- `language_code`: The language code for the language used for the entries in your custom
-  vocabulary. The language code of your custom vocabulary must match the language code of
-  your transcription job. US English (en-US) is the only language code available for Amazon
-  Transcribe Medical.
-- `vocabulary_file_uri`: The location in Amazon S3 of the text file you use to define your
+- `language_code`: The language code that represents the language of the entries in your
+  custom vocabulary. Note that U.S. English (en-US) is the only language supported with
+  Amazon Transcribe Medical.
+- `vocabulary_file_uri`: The Amazon S3 location (URI) of the text file that contains your
   custom vocabulary. The URI must be in the same Amazon Web Services Region as the resource
-  that you're calling. Enter information about your VocabularyFileUri in the following
-  format:
-  https://s3.&lt;aws-region&gt;.amazonaws.com/&lt;bucket-name&gt;/&lt;keyprefix&gt;/&lt;object
-  key&gt;   The following is an example URI for a vocabulary file that is stored in Amazon
-  S3:  https://s3.us-east-1.amazonaws.com/AWSDOC-EXAMPLE-BUCKET/vocab.txt  For more
-  information about Amazon S3 object names, see Object Keys in the Amazon S3 Developer Guide.
-  For more information about custom vocabularies, see Medical Custom Vocabularies.
-- `vocabulary_name`: The name of the custom vocabulary. This case-sensitive name must be
-  unique within an Amazon Web Services account. If you try to create a vocabulary with the
-  same name as a previous vocabulary, you get a ConflictException error.
+  that you're calling. Here's an example URI path:
+  https://s3.us-east-1.amazonaws.com/my-s3-bucket/my-vocab-file.txt
+- `vocabulary_name`: The name of your new vocabulary. This name is case sensitive, cannot
+  contain spaces, and must be unique within an Amazon Web Services account. If you try to
+  create a vocabulary with the same name as a previous vocabulary, you get a
+  ConflictException error.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"Tags"`: Adds one or more tags, each in the form of a key:value pair, to a new medical
-  vocabulary at the time you create this new vocabulary.
+  vocabulary at the time you create the new vocabulary. To learn more about using tags with
+  Amazon Transcribe, refer to Tagging resources.
 """
 function create_medical_vocabulary(
     LanguageCode,
@@ -198,26 +208,33 @@ end
     create_vocabulary(language_code, vocabulary_name)
     create_vocabulary(language_code, vocabulary_name, params::Dict{String,<:Any})
 
-Creates a new custom vocabulary that you can use to change the way Amazon Transcribe
-handles transcription of an audio file.
+Creates a new custom vocabulary. When creating a new medical vocabulary, you can either
+upload a text file that contains your new entries, phrases, and terms into an S3 bucket or
+include a list of terms directly in your request using the Phrases flag. For more
+information on creating a custom vocabulary, see Creating a custom vocabulary.
 
 # Arguments
-- `language_code`: The language code of the vocabulary entries. For a list of languages and
-  their corresponding language codes, see transcribe-whatis.
-- `vocabulary_name`: The name of the vocabulary. The name must be unique within an Amazon
-  Web Services account. The name is case sensitive. If you try to create a vocabulary with
-  the same name as a previous vocabulary you will receive a ConflictException error.
+- `language_code`: The language code that represents the language of the entries in your
+  custom vocabulary. Each vocabulary must contain terms in only one language. For a list of
+  languages and their corresponding language codes, see Supported languages.
+- `vocabulary_name`: The name of your new vocabulary. This name is case sensitive, cannot
+  contain spaces, and must be unique within an Amazon Web Services account. If you try to
+  create a vocabulary with the same name as a previous vocabulary, you get a
+  ConflictException error.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"Phrases"`: An array of strings that contains the vocabulary entries.
-- `"Tags"`: Adds one or more tags, each in the form of a key:value pair, to a new Amazon
-  Transcribe vocabulary at the time you create this new vocabulary.
-- `"VocabularyFileUri"`: The S3 location of the text file that contains the definition of
-  the custom vocabulary. The URI must be in the same region as the API endpoint that you are
-  calling. The general form is: For more information about S3 object names, see Object Keys
-  in the Amazon S3 Developer Guide. For more information about custom vocabularies, see
-  Custom vocabularies.
+- `"Phrases"`: Use this flag to include a list of terms within your request. Note that if
+  you include Phrases in your request, you cannot use VocabularyFileUri; you must choose one
+  or the other.
+- `"Tags"`: Adds one or more tags, each in the form of a key:value pair, to a new custom
+  vocabulary at the time you create this new vocabulary.
+- `"VocabularyFileUri"`: The S3 location of the text file that contains your custom
+  vocabulary. The URI must be located in the same region as the API endpoint you're calling.
+  Here's an example URI path:
+  https://s3.us-east-1.amazonaws.com/my-s3-bucket/my-vocab-file.txt  Note that if you include
+  VocabularyFileUri in your request, you cannot use the Phrases flag; you must choose one or
+  the other.
 """
 function create_vocabulary(
     LanguageCode, VocabularyName; aws_config::AbstractAWSConfig=global_aws_config()
@@ -257,30 +274,31 @@ end
     create_vocabulary_filter(language_code, vocabulary_filter_name)
     create_vocabulary_filter(language_code, vocabulary_filter_name, params::Dict{String,<:Any})
 
-Creates a new vocabulary filter that you can use to filter words, such as profane words,
-from the output of a transcription job.
+Creates a new vocabulary filter that you can use to filter words from your transcription
+output. For example, you can use this operation to remove profanity from your transcript.
 
 # Arguments
 - `language_code`: The language code of the words in the vocabulary filter. All words in
   the filter must be in the same language. The vocabulary filter can only be used with
   transcription jobs in the specified language.
-- `vocabulary_filter_name`: The vocabulary filter name. The name must be unique within the
-  account that contains it. If you try to create a vocabulary filter with the same name as
-  another vocabulary filter, you get a ConflictException error.
+- `vocabulary_filter_name`: The name of your new vocabulary filter. This name is case
+  sensitive, cannot contain spaces, and must be unique within an Amazon Web Services account.
+  If you try to create a vocabulary filter with the same name as a previous vocabulary
+  filter, you get a ConflictException error.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"Tags"`: Adds one or more tags, each in the form of a key:value pair, to a new Amazon
-  Transcribe vocabulary filter at the time you create this new vocabulary filter.
+- `"Tags"`: Adds one or more tags, each in the form of a key:value pair, to a new
+  vocabulary filter at the time you create this new vocabulary filter.
 - `"VocabularyFilterFileUri"`: The Amazon S3 location of a text file used as input to
   create the vocabulary filter. Only use characters from the character set defined for custom
-  vocabularies. For a list of character sets, see Character Sets for Custom Vocabularies. The
-  specified file must be less than 50 KB of UTF-8 characters. If you provide the location of
-  a list of words in the VocabularyFilterFileUri parameter, you can't use the Words parameter.
-- `"Words"`: The words to use in the vocabulary filter. Only use characters from the
-  character set defined for custom vocabularies. For a list of character sets, see Character
-  Sets for Custom Vocabularies. If you provide a list of words in the Words parameter, you
-  can't use the VocabularyFilterFileUri parameter.
+  vocabularies. For a list of character sets, see Character Sets for Custom Vocabularies.
+  Your vocabulary filter file must be less than 50 KB in size. Note that if you include
+  VocabularyFilterFileUri in your request, you cannot use Words; you must choose one or the
+  other.
+- `"Words"`: The words you want in your vocabulary filter. Only use characters specified in
+  the Character sets for the language you're transcribing. Note that if you include Words in
+  your request, you cannot use VocabularyFilterFileUri; you must choose one or the other.
 """
 function create_vocabulary_filter(
     LanguageCode, VocabularyFilterName; aws_config::AbstractAWSConfig=global_aws_config()
@@ -321,11 +339,12 @@ end
     delete_call_analytics_category(category_name)
     delete_call_analytics_category(category_name, params::Dict{String,<:Any})
 
-Deletes a call analytics category using its name.
+Deletes a call analytics category. To use this operation, specify the name of the category
+you want to delete using CategoryName.
 
 # Arguments
-- `category_name`: The name of the call analytics category that you're choosing to delete.
-  The value is case sensitive.
+- `category_name`: The name of the call analytics category you want to delete. Category
+  names are case-sensitive.
 
 """
 function delete_call_analytics_category(
@@ -357,10 +376,12 @@ end
     delete_call_analytics_job(call_analytics_job_name)
     delete_call_analytics_job(call_analytics_job_name, params::Dict{String,<:Any})
 
-Deletes a call analytics job using its name.
+Deletes a call analytics job. To use this operation, specify the name of the job you want
+to delete using CallAnalyticsJobName.
 
 # Arguments
-- `call_analytics_job_name`: The name of the call analytics job you want to delete.
+- `call_analytics_job_name`: The name of the call analytics job you want to delete. Job
+  names are case-sensitive.
 
 """
 function delete_call_analytics_job(
@@ -396,10 +417,11 @@ end
     delete_language_model(model_name)
     delete_language_model(model_name, params::Dict{String,<:Any})
 
-Deletes a custom language model using its name.
+Deletes a custom language model. To use this operation, specify the name of the language
+model you want to delete using ModelName.
 
 # Arguments
-- `model_name`: The name of the model you're choosing to delete.
+- `model_name`: The name of the model you want to delete. Model names are case-sensitive.
 
 """
 function delete_language_model(ModelName; aws_config::AbstractAWSConfig=global_aws_config())
@@ -429,12 +451,12 @@ end
     delete_medical_transcription_job(medical_transcription_job_name)
     delete_medical_transcription_job(medical_transcription_job_name, params::Dict{String,<:Any})
 
-Deletes a transcription job generated by Amazon Transcribe Medical and any related
-information.
+Deletes a medical transcription job, along with any related information. To use this
+operation, specify the name of the job you want to delete using MedicalTranscriptionJobName.
 
 # Arguments
-- `medical_transcription_job_name`: The name you provide to the
-  DeleteMedicalTranscriptionJob object to delete a transcription job.
+- `medical_transcription_job_name`: The name of the medical transcription job you want to
+  delete. Job names are case-sensitive.
 
 """
 function delete_medical_transcription_job(
@@ -472,10 +494,12 @@ end
     delete_medical_vocabulary(vocabulary_name)
     delete_medical_vocabulary(vocabulary_name, params::Dict{String,<:Any})
 
-Deletes a vocabulary from Amazon Transcribe Medical.
+Deletes a custom medical vocabulary. To use this operation, specify the name of the
+vocabulary you want to delete using VocabularyName.
 
 # Arguments
-- `vocabulary_name`: The name of the vocabulary that you want to delete.
+- `vocabulary_name`: The name of the vocabulary that you want to delete. Vocabulary names
+  are case-sensitive.
 
 """
 function delete_medical_vocabulary(
@@ -507,11 +531,12 @@ end
     delete_transcription_job(transcription_job_name)
     delete_transcription_job(transcription_job_name, params::Dict{String,<:Any})
 
-Deletes a previously submitted transcription job along with any other generated results
-such as the transcription, models, and so on.
+Deletes a transcription job, along with any related information. To use this operation,
+specify the name of the job you want to delete using TranscriptionJobName.
 
 # Arguments
-- `transcription_job_name`: The name of the transcription job to be deleted.
+- `transcription_job_name`: The name of the transcription job you want to delete. Job names
+  are case-sensitive.
 
 """
 function delete_transcription_job(
@@ -547,10 +572,12 @@ end
     delete_vocabulary(vocabulary_name)
     delete_vocabulary(vocabulary_name, params::Dict{String,<:Any})
 
-Deletes a vocabulary from Amazon Transcribe.
+Deletes a custom vocabulary. To use this operation, specify the name of the vocabulary you
+want to delete using VocabularyName.
 
 # Arguments
-- `vocabulary_name`: The name of the vocabulary to delete.
+- `vocabulary_name`: The name of the vocabulary you want to delete. Vocabulary names are
+  case-sensitive.
 
 """
 function delete_vocabulary(
@@ -582,10 +609,12 @@ end
     delete_vocabulary_filter(vocabulary_filter_name)
     delete_vocabulary_filter(vocabulary_filter_name, params::Dict{String,<:Any})
 
-Removes a vocabulary filter.
+Deletes a vocabulary filter. To use this operation, specify the name of the vocabulary
+filter you want to delete using VocabularyFilterName.
 
 # Arguments
-- `vocabulary_filter_name`: The name of the vocabulary filter to remove.
+- `vocabulary_filter_name`: The name of the vocabulary filter you want to delete.
+  Vocabulary filter names are case-sensitive.
 
 """
 function delete_vocabulary_filter(
@@ -621,15 +650,16 @@ end
     describe_language_model(model_name)
     describe_language_model(model_name, params::Dict{String,<:Any})
 
-Gets information about a single custom language model. Use this information to see details
-about the language model in your Amazon Web Services account. You can also see whether the
-base language model used to create your custom language model has been updated. If Amazon
-Transcribe has updated the base model, you can create a new custom language model using the
-updated base model. If the language model wasn't created, you can use this operation to
-understand why Amazon Transcribe couldn't create it.
+Provides information about a specific custom language model in your Amazon Web Services
+account. This operation also shows if the base language model you used to create your
+custom language model has been updated. If Amazon Transcribe has updated the base model,
+you can create a new custom language model using the updated base model. If you tried to
+create a new custom language model and the request wasn't successful, you can use this
+operation to help identify the reason.
 
 # Arguments
-- `model_name`: The name of the custom language model you submit to get more information.
+- `model_name`: The name of the custom language model you want described. Model names are
+  case-sensitive.
 
 """
 function describe_language_model(
@@ -664,8 +694,8 @@ end
 Retrieves information about a call analytics category.
 
 # Arguments
-- `category_name`: The name of the category you want information about. This value is case
-  sensitive.
+- `category_name`: The name of the category you want information about. Category names are
+  case sensitive.
 
 """
 function get_call_analytics_category(
@@ -697,9 +727,9 @@ end
     get_call_analytics_job(call_analytics_job_name)
     get_call_analytics_job(call_analytics_job_name, params::Dict{String,<:Any})
 
-Returns information about a call analytics job. To see the status of the job, check the
-CallAnalyticsJobStatus field. If the status is COMPLETED, the job is finished and you can
-find the results at the location specified in the TranscriptFileUri field. If you enable
+Retrieves information about a call analytics job. To view the job's status, refer to the
+CallAnalyticsJobStatus field. If the status is COMPLETED, the job is finished. You can then
+find your transcript at the URI specified in the TranscriptFileUri field. If you enabled
 personally identifiable information (PII) redaction, the redacted transcript appears in the
 RedactedTranscriptFileUri field.
 
@@ -741,12 +771,13 @@ end
     get_medical_transcription_job(medical_transcription_job_name)
     get_medical_transcription_job(medical_transcription_job_name, params::Dict{String,<:Any})
 
-Returns information about a transcription job from Amazon Transcribe Medical. To see the
-status of the job, check the TranscriptionJobStatus field. If the status is COMPLETED, the
-job is finished. You find the results of the completed job in the TranscriptFileUri field.
+Retrieves information about a medical transcription job. To view the job's status, refer to
+the TranscriptionJobStatus field. If the status is COMPLETED, the job is finished. You can
+then find your transcript at the URI specified in the TranscriptFileUri field.
 
 # Arguments
-- `medical_transcription_job_name`: The name of the medical transcription job.
+- `medical_transcription_job_name`: The name of the medical transcription job you want
+  information about. This value is case sensitive.
 
 """
 function get_medical_transcription_job(
@@ -787,8 +818,8 @@ end
 Retrieves information about a medical vocabulary.
 
 # Arguments
-- `vocabulary_name`: The name of the vocabulary that you want information about. The value
-  is case sensitive.
+- `vocabulary_name`: The name of the medical vocabulary you want information about. This
+  value is case sensitive.
 
 """
 function get_medical_vocabulary(
@@ -1290,20 +1321,20 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   can use either of the following to identify a KMS key in the current account or another
   account:   Amazon Resource Name (ARN) of a KMS key in the current account or another
   account: \"arn:aws:kms:region:account ID:key/1234abcd-12ab-34cd-56ef1234567890ab\"   ARN of
-  a KMS Key Alias: \"arn:aws:kms:region:account ID:alias/ExampleAlias\"   If you don't
-  specify an encryption key, the output of the call analytics job is encrypted with the
-  default Amazon S3 key (SSE-S3). If you specify a KMS key to encrypt your output, you must
-  also specify an output location in the OutputLocation parameter.
+  a KMS Key Alias: \"arn:aws:kms:region:accountID:alias/ExampleAlias\"   If you don't specify
+  an encryption key, the output of the call analytics job is encrypted with the default
+  Amazon S3 key (SSE-S3). If you specify a KMS key to encrypt your output, you must also
+  specify an output location in the OutputLocation parameter.
 - `"OutputLocation"`: The Amazon S3 location where the output of the call analytics job is
   stored. You can provide the following location types to store the output of call analytics
   job:   s3://DOC-EXAMPLE-BUCKET1  If you specify a bucket, Amazon Transcribe saves the
   output of the analytics job as a JSON file at the root level of the bucket.
   s3://DOC-EXAMPLE-BUCKET1/folder/ f you specify a path, Amazon Transcribe saves the output
-  of the analytics job as s3://DOC-EXAMPLE-BUCKET1/folder/your-transcription-job-name.json If
-  you specify a folder, you must provide a trailing slash.
-  s3://DOC-EXAMPLE-BUCKET1/folder/filename.json  If you provide a path that has the filename
+  of the analytics job as s3://DOC-EXAMPLE-BUCKET1/folder/your-transcription-job-name.json.
+  If you specify a folder, you must provide a trailing slash.
+  s3://DOC-EXAMPLE-BUCKET1/folder/filename.json.  If you provide a path that has the filename
   specified, Amazon Transcribe saves the output of the analytics job as
-  s3://DOC-EXAMPLEBUCKET1/folder/filename.json   You can specify an Amazon Web Services Key
+  s3://DOC-EXAMPLEBUCKET1/folder/filename.json.   You can specify an Amazon Web Services Key
   Management Service (KMS) key to encrypt the output of our analytics job using the
   OutputEncryptionKMSKeyId parameter. If you don't specify a KMS key, Amazon Transcribe uses
   the default Amazon S3 key for server-side encryption of the analytics job output that is
@@ -1421,7 +1452,7 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   file name, for example \"folder/my-other-job-name.json\". If you specify an output key, you
   must also specify an S3 bucket in the OutputBucketName parameter.
 - `"Settings"`: Optional settings for the medical transcription job.
-- `"Tags"`: Add tags to an Amazon Transcribe medical transcription job.
+- `"Tags"`: Add tags to an Amazon Transcribe Medical transcription job.
 """
 function start_medical_transcription_job(
     LanguageCode,
@@ -1496,15 +1527,17 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   redaction.
 - `"IdentifyLanguage"`: Set this field to true to enable automatic language identification.
   Automatic language identification is disabled by default. You receive a BadRequestException
-  error if you enter a value for a LanguageCode.
+  error if you enter a value for a LanguageCode. You must include either LanguageCode or
+  IdentifyLanguage in your request.
 - `"JobExecutionSettings"`: Provides information about how a transcription job is executed.
   Use this field to indicate that the job can be queued for deferred execution if the
   concurrency limit is reached and there are no slots available to immediately run the job.
 - `"KMSEncryptionContext"`: A map of plain text, non-secret key:value pairs, known as
   encryption context pairs, that provide an added layer of security for your data.
-- `"LanguageCode"`: The language code for the language used in the input media file. To
-  transcribe speech in Modern Standard Arabic (ar-SA), your audio or video file must be
-  encoded at a sample rate of 16,000 Hz or higher.
+- `"LanguageCode"`: The language code for the language used in the input media file. You
+  must include either LanguageCode or IdentifyLanguage in your request. To transcribe speech
+  in Modern Standard Arabic (ar-SA), your audio or video file must be encoded at a sample
+  rate of 16,000 Hz or higher.
 - `"LanguageIdSettings"`: The language identification settings associated with your
   transcription job. These settings include VocabularyName, VocabularyFilterName, and
   LanguageModelName.
@@ -1742,7 +1775,8 @@ the existing information with the values that you provide in the request.
 
 # Arguments
 - `language_code`: The language code of the language used for the entries in the updated
-  vocabulary. US English (en-US) is the only valid language code in Amazon Transcribe Medical.
+  vocabulary. U.S. English (en-US) is the only valid language code in Amazon Transcribe
+  Medical.
 - `vocabulary_name`: The name of the vocabulary to update. The name is case sensitive. If
   you try to update a vocabulary with the same name as a vocabulary you've already made, you
   get a ConflictException error.
@@ -1752,11 +1786,11 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"VocabularyFileUri"`: The location in Amazon S3 of the text file that contains your
   custom vocabulary. The URI must be in the same Amazon Web Services Region as the resource
   that you are calling. The following is the format for a URI:
-  https://s3.&lt;aws-region&gt;.amazonaws.com/&lt;bucket-name&gt;/&lt;keyprefix&gt;/&lt;object
-  key&gt;   For example:  https://s3.us-east-1.amazonaws.com/AWSDOC-EXAMPLE-BUCKET/vocab.txt
-  For more information about Amazon S3 object names, see Object Keys in the Amazon S3
-  Developer Guide. For more information about custom vocabularies in Amazon Transcribe
-  Medical, see Medical Custom Vocabularies.
+  https://s3.aws-region.amazonaws.com/bucket-name/keyprefix/objectkey  For example:
+  https://s3.us-east-1.amazonaws.com/DOC-EXAMPLE-BUCKET/vocab.txt  For more information about
+  Amazon S3 object names, see Object Keys in the Amazon S3 Developer Guide. For more
+  information about custom vocabularies in Amazon Transcribe Medical, see Medical Custom
+  Vocabularies.
 """
 function update_medical_vocabulary(
     LanguageCode, VocabularyName; aws_config::AbstractAWSConfig=global_aws_config()
@@ -1801,7 +1835,7 @@ all of the existing information with the values that you provide in the request.
 
 # Arguments
 - `language_code`: The language code of the vocabulary entries. For a list of languages and
-  their corresponding language codes, see transcribe-whatis.
+  their corresponding language codes, see Supported languages.
 - `vocabulary_name`: The name of the vocabulary to update. The name is case sensitive. If
   you try to update a vocabulary with the same name as a previous vocabulary you will receive
   a ConflictException error.
@@ -1811,9 +1845,11 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"Phrases"`: An array of strings containing the vocabulary entries.
 - `"VocabularyFileUri"`: The S3 location of the text file that contains the definition of
   the custom vocabulary. The URI must be in the same region as the API endpoint that you are
-  calling. The general form is  For example: For more information about S3 object names, see
-  Object Keys in the Amazon S3 Developer Guide. For more information about custom
-  vocabularies, see Custom Vocabularies.
+  calling. The general form is:
+  https://s3.aws-region.amazonaws.com/bucket-name/keyprefix/objectkey  For example:
+  https://s3.us-east-1.amazonaws.com/DOC-EXAMPLE-BUCKET/vocab.txt  For more information about
+  S3 object names, see Object Keys in the Amazon S3 Developer Guide. For more information
+  about custom vocabularies, see Custom Vocabularies.
 """
 function update_vocabulary(
     LanguageCode, VocabularyName; aws_config::AbstractAWSConfig=global_aws_config()

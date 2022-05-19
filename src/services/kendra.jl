@@ -106,9 +106,9 @@ end
     batch_delete_document(document_id_list, index_id, params::Dict{String,<:Any})
 
 Removes one or more documents from an index. The documents must have been added with the
-BatchPutDocument operation. The documents are deleted asynchronously. You can see the
-progress of the deletion by using Amazon Web Services CloudWatch. Any error messages
-related to the processing of the batch are sent to you CloudWatch log.
+BatchPutDocument API. The documents are deleted asynchronously. You can see the progress of
+the deletion by using Amazon Web Services CloudWatch. Any error messages related to the
+processing of the batch are sent to you CloudWatch log.
 
 # Arguments
 - `document_id_list`: One or more identifiers for documents to delete from the index.
@@ -153,19 +153,18 @@ end
     batch_get_document_status(document_info_list, index_id, params::Dict{String,<:Any})
 
 Returns the indexing status for one or more documents submitted with the  BatchPutDocument
-operation. When you use the BatchPutDocument operation, documents are indexed
-asynchronously. You can use the BatchGetDocumentStatus operation to get the current status
-of a list of documents so that you can determine if they have been successfully indexed.
-You can also use the BatchGetDocumentStatus operation to check the status of the
-BatchDeleteDocument operation. When a document is deleted from the index, Amazon Kendra
-returns NOT_FOUND as the status.
+API. When you use the BatchPutDocument API, documents are indexed asynchronously. You can
+use the BatchGetDocumentStatus API to get the current status of a list of documents so that
+you can determine if they have been successfully indexed. You can also use the
+BatchGetDocumentStatus API to check the status of the  BatchDeleteDocument API. When a
+document is deleted from the index, Amazon Kendra returns NOT_FOUND as the status.
 
 # Arguments
 - `document_info_list`: A list of DocumentInfo objects that identify the documents for
   which to get the status. You identify the documents by their document ID and optional
   attributes.
 - `index_id`: The identifier of the index to add documents to. The index ID is returned by
-  the  CreateIndex  operation.
+  the CreateIndex  API.
 
 """
 function batch_get_document_status(
@@ -204,35 +203,31 @@ end
     batch_put_document(documents, index_id)
     batch_put_document(documents, index_id, params::Dict{String,<:Any})
 
-Adds one or more documents to an index. The BatchPutDocument operation enables you to
-ingest inline documents or a set of documents stored in an Amazon S3 bucket. Use this
-operation to ingest your text and unstructured text into an index, add custom attributes to
-the documents, and to attach an access control list to the documents added to the index.
-The documents are indexed asynchronously. You can see the progress of the batch using
-Amazon Web Services CloudWatch. Any error messages related to processing the batch are sent
-to your Amazon Web Services CloudWatch log.
+Adds one or more documents to an index. The BatchPutDocument API enables you to ingest
+inline documents or a set of documents stored in an Amazon S3 bucket. Use this API to
+ingest your text and unstructured text into an index, add custom attributes to the
+documents, and to attach an access control list to the documents added to the index. The
+documents are indexed asynchronously. You can see the progress of the batch using Amazon
+Web Services CloudWatch. Any error messages related to processing the batch are sent to
+your Amazon Web Services CloudWatch log.
 
 # Arguments
-- `documents`: One or more documents to add to the index. Documents can include custom
-  attributes. For example, 'DataSourceId' and 'DataSourceSyncJobId' are custom attributes
-  that provide information on the synchronization of documents running on a data source.
-  Note, 'DataSourceSyncJobId' could be an optional custom attribute as Amazon Kendra will use
-  the ID of a running sync job. Documents have the following file size limits.   5 MB total
-  size for inline documents   50 MB total size for files from an S3 bucket   5 MB extracted
-  text for any file   For more information about file size and transaction per second quotas,
-  see Quotas.
+- `documents`: One or more documents to add to the index. Documents have the following file
+  size limits.   5 MB total size for inline documents   50 MB total size for files from an S3
+  bucket   5 MB extracted text for any file   For more information about file size and
+  transaction per second quotas, see Quotas.
 - `index_id`: The identifier of the index to add the documents to. You need to create the
-  index first using the CreateIndex operation.
+  index first using the CreateIndex API.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"CustomDocumentEnrichmentConfiguration"`: Configuration information for altering your
   document metadata and content during the document ingestion process when you use the
-  BatchPutDocument operation. For more information on how to create, modify and delete
-  document metadata, or make other content alterations when you ingest documents into Amazon
-  Kendra, see Customizing document metadata during the ingestion process.
+  BatchPutDocument API. For more information on how to create, modify and delete document
+  metadata, or make other content alterations when you ingest documents into Amazon Kendra,
+  see Customizing document metadata during the ingestion process.
 - `"RoleArn"`: The Amazon Resource Name (ARN) of a role that is allowed to run the
-  BatchPutDocument operation. For more information, see IAM Roles for Amazon Kendra.
+  BatchPutDocument API. For more information, see IAM Roles for Amazon Kendra.
 """
 function batch_put_document(
     Documents, IndexId; aws_config::AbstractAWSConfig=global_aws_config()
@@ -318,9 +313,9 @@ data sources in the Amazon Web Services GovCloud (US-West) region.
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"ClientToken"`: A token that you provide to identify the request to create a data
-  source. Multiple calls to the CreateDataSource operation with the same client token will
-  create only one data source.
-- `"Configuration"`: The connector configuration information that is required to access the
+  source. Multiple calls to the CreateDataSource API with the same client token will create
+  only one data source.
+- `"Configuration"`: Configuration information that is required to access the data source
   repository. You can't specify the Configuration parameter when the Type parameter is set to
   CUSTOM. If you do, you receive a ValidationException exception. The Configuration parameter
   is required for all other data sources.
@@ -338,11 +333,11 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   source. For more information, see IAM Roles for Amazon Kendra. You can't specify the
   RoleArn parameter when the Type parameter is set to CUSTOM. If you do, you receive a
   ValidationException exception. The RoleArn parameter is required for all other data sources.
-- `"Schedule"`: Sets the frequency that Amazon Kendra will check the documents in your
+- `"Schedule"`: Sets the frequency for Amazon Kendra to check the documents in your
   repository and update the index. If you don't set a schedule Amazon Kendra will not
-  periodically update the index. You can call the StartDataSourceSyncJob operation to update
-  the index. You can't specify the Schedule parameter when the Type parameter is set to
-  CUSTOM. If you do, you receive a ValidationException exception.
+  periodically update the index. You can call the StartDataSourceSyncJob API to update the
+  index. You can't specify the Schedule parameter when the Type parameter is set to CUSTOM.
+  If you do, you receive a ValidationException exception.
 - `"Tags"`: A list of key-value pairs that identify the data source. You can use the tags
   to identify and organize your resources and to control access to resources.
 """
@@ -401,17 +396,16 @@ creating a search application experience, see Building a search experience with 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"ClientToken"`: A token that you provide to identify the request to create your Amazon
-  Kendra experience. Multiple calls to the CreateExperience operation with the same client
-  token creates only one Amazon Kendra experience.
-- `"Configuration"`: Provides the configuration information for your Amazon Kendra
-  experience. This includes ContentSourceConfiguration, which specifies the data source IDs
-  and/or FAQ IDs, and UserIdentityConfiguration, which specifies the user or group
-  information to grant access to your Amazon Kendra experience.
+  Kendra experience. Multiple calls to the CreateExperience API with the same client token
+  creates only one Amazon Kendra experience.
+- `"Configuration"`: Configuration information for your Amazon Kendra experience. This
+  includes ContentSourceConfiguration, which specifies the data source IDs and/or FAQ IDs,
+  and UserIdentityConfiguration, which specifies the user or group information to grant
+  access to your Amazon Kendra experience.
 - `"Description"`: A description for your Amazon Kendra experience.
 - `"RoleArn"`: The Amazon Resource Name (ARN) of a role with permission to access Query
-  operations, QuerySuggestions operations, SubmitFeedback operations, and Amazon Web Services
-  SSO that stores your user and group information. For more information, see IAM roles for
-  Amazon Kendra.
+  API, QuerySuggestions API, SubmitFeedback API, and Amazon Web Services SSO that stores your
+  user and group information. For more information, see IAM roles for Amazon Kendra.
 """
 function create_experience(IndexId, Name; aws_config::AbstractAWSConfig=global_aws_config())
     return kendra(
@@ -449,7 +443,8 @@ end
     create_faq(index_id, name, role_arn, s3_path)
     create_faq(index_id, name, role_arn, s3_path, params::Dict{String,<:Any})
 
-Creates an new set of frequently asked question (FAQ) questions and answers.
+Creates an new set of frequently asked question (FAQ) questions and answers. Adding FAQs to
+an index is an asynchronous operation.
 
 # Arguments
 - `index_id`: The identifier of the index that contains the FAQ.
@@ -461,8 +456,8 @@ Creates an new set of frequently asked question (FAQ) questions and answers.
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"ClientToken"`: A token that you provide to identify the request to create a FAQ.
-  Multiple calls to the CreateFaqRequest operation with the same client token will create
-  only one FAQ.
+  Multiple calls to the CreateFaqRequest API with the same client token will create only one
+  FAQ.
 - `"Description"`: A description of the FAQ.
 - `"FileFormat"`: The format of the input file. You can choose between a basic CSV format,
   a CSV format that includes customs attributes in a header, and a JSON format that includes
@@ -522,23 +517,22 @@ end
     create_index(name, role_arn)
     create_index(name, role_arn, params::Dict{String,<:Any})
 
-Creates a new Amazon Kendra index. Index creation is an asynchronous operation. To
-determine if index creation has completed, check the Status field returned from a call to
-DescribeIndex. The Status field is set to ACTIVE when the index is ready to use. Once the
-index is active you can index your documents using the BatchPutDocument operation or using
-one of the supported data sources.
+Creates a new Amazon Kendra index. Index creation is an asynchronous API. To determine if
+index creation has completed, check the Status field returned from a call to DescribeIndex.
+The Status field is set to ACTIVE when the index is ready to use. Once the index is active
+you can index your documents using the BatchPutDocument API or using one of the supported
+data sources.
 
 # Arguments
 - `name`: The name for the new index.
-- `role_arn`: An Identity and Access Management(IAM) role that gives Amazon Kendra
-  permissions to access your Amazon CloudWatch logs and metrics. This is also the role used
-  when you use the BatchPutDocument operation to index documents from an Amazon S3 bucket.
+- `role_arn`: An Identity and Access Management (IAM) role that gives Amazon Kendra
+  permissions to access your Amazon CloudWatch logs and metrics. This is also the role you
+  use when you call the BatchPutDocument API to index documents from an Amazon S3 bucket.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"ClientToken"`: A token that you provide to identify the request to create an index.
-  Multiple calls to the CreateIndex operation with the same client token will create only one
-  index.
+  Multiple calls to the CreateIndex API with the same client token will create only one index.
 - `"Description"`: A description for the index.
 - `"Edition"`: The Amazon Kendra edition to use for the index. Choose DEVELOPER_EDITION for
   indexes intended for development, testing, or proof of concept. Use ENTERPRISE_EDITION for
@@ -546,8 +540,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   Edition parameter is optional. If you don't supply a value, the default is
   ENTERPRISE_EDITION. For more information on quota limits for enterprise and developer
   editions, see Quotas.
-- `"ServerSideEncryptionConfiguration"`: The identifier of the KMScustomer managed key
-  (CMK) to use to encrypt data indexed by Amazon Kendra. Amazon Kendra doesn't support
+- `"ServerSideEncryptionConfiguration"`: The identifier of the KMS customer managed key
+  (CMK) that's used to encrypt data indexed by Amazon Kendra. Amazon Kendra doesn't support
   asymmetric CMKs.
 - `"Tags"`: A list of key-value pairs that identify the index. You can use the tags to
   identify and organize your resources and to control access to resources.
@@ -614,8 +608,8 @@ GovCloud (US-West) region.
   to be blocked from suggestions.
 - `role_arn`: The IAM (Identity and Access Management) role used by Amazon Kendra to access
   the block list text file in your S3 bucket. You need permissions to the role ARN (Amazon
-  Resource Name). The role needs S3 read permissions to your file in S3 and needs to give STS
-  (Security Token Service) assume role permissions to Amazon Kendra.
+  Web Services Resource Name). The role needs S3 read permissions to your file in S3 and
+  needs to give STS (Security Token Service) assume role permissions to Amazon Kendra.
 - `source_s3_path`: The S3 path to your block list text file in your S3 bucket. Each block
   word or phrase should be on a separate line in a text file. For information on the current
   quota limits for block lists, see Quotas for Amazon Kendra.
@@ -689,8 +683,8 @@ Creates a thesaurus for an index. The thesaurus contains a list of synonyms in S
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"ClientToken"`: A token that you provide to identify the request to create a thesaurus.
-  Multiple calls to the CreateThesaurus operation with the same client token will create only
-  one thesaurus.
+  Multiple calls to the CreateThesaurus API with the same client token will create only one
+  thesaurus.
 - `"Description"`: The description for the new thesaurus.
 - `"Tags"`: A list of key-value pairs that identify the thesaurus. You can use the tags to
   identify and organize your resources and to control access to resources.
@@ -745,8 +739,8 @@ end
 
 Deletes an Amazon Kendra data source. An exception is not thrown if the data source is
 already being deleted. While the data source is being deleted, the Status field returned by
-a call to the DescribeDataSource operation is set to DELETING. For more information, see
-Deleting Data Sources.
+a call to the DescribeDataSource API is set to DELETING. For more information, see Deleting
+Data Sources.
 
 # Arguments
 - `id`: The unique identifier of the data source to delete.
@@ -855,7 +849,7 @@ end
 
 Deletes an existing Amazon Kendra index. An exception is not thrown if the index is already
 being deleted. While the index is being deleted, the Status field returned by a call to the
-DescribeIndex operation is set to DELETING.
+DescribeIndex API is set to DELETING.
 
 # Arguments
 - `id`: The identifier of the index to delete.
@@ -1027,7 +1021,7 @@ end
     describe_data_source(id, index_id)
     describe_data_source(id, index_id, params::Dict{String,<:Any})
 
-Gets information about a Amazon Kendra data source.
+Gets information about an Amazon Kendra data source.
 
 # Arguments
 - `id`: The unique identifier of the data source to describe.
@@ -1137,10 +1131,10 @@ end
     describe_index(id)
     describe_index(id, params::Dict{String,<:Any})
 
-Describes an existing Amazon Kendra index
+Describes an existing Amazon Kendra index.
 
 # Arguments
-- `id`: The name of the index to describe.
+- `id`: The identifier of the index to describe.
 
 """
 function describe_index(Id; aws_config::AbstractAWSConfig=global_aws_config())
@@ -1835,7 +1829,7 @@ end
     list_indices()
     list_indices(params::Dict{String,<:Any})
 
-Lists the Amazon Kendra indexes that you have created.
+Lists the Amazon Kendra indexes that you created.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -2056,22 +2050,21 @@ function put_principal_mapping(
 end
 
 """
-    query(index_id, query_text)
-    query(index_id, query_text, params::Dict{String,<:Any})
+    query(index_id)
+    query(index_id, params::Dict{String,<:Any})
 
-Searches an active index. Use this API to search your documents using query. The Query
-operation enables to do faceted search and to filter results based on document attributes.
-It also enables you to provide user context that Amazon Kendra uses to enforce document
-access control in the search results.  Amazon Kendra searches your index for text content
-and question and answer (FAQ) content. By default the response contains three types of
-results.   Relevant passages   Matching FAQs   Relevant documents   You can specify that
-the query return only one type of result using the QueryResultTypeConfig parameter. Each
-query returns the 100 most relevant results.
+Searches an active index. Use this API to search your documents using query. The Query API
+enables to do faceted search and to filter results based on document attributes. It also
+enables you to provide user context that Amazon Kendra uses to enforce document access
+control in the search results. Amazon Kendra searches your index for text content and
+question and answer (FAQ) content. By default the response contains three types of results.
+  Relevant passages   Matching FAQs   Relevant documents   You can specify that the query
+return only one type of result using the QueryResultTypeConfig parameter. Each query
+returns the 100 most relevant results.
 
 # Arguments
 - `index_id`: The unique identifier of the index to search. The identifier is returned in
-  the response from the CreateIndex operation.
-- `query_text`: The text to search for.
+  the response from the CreateIndex API.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -2090,8 +2083,7 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   use this API to override only some of these fields, then for the fields you did not
   override, the importance is set to 1.
 - `"Facets"`: An array of documents attributes. Amazon Kendra returns a count for each
-  attribute key specified. You can use this information to help narrow the search for your
-  user.
+  attribute key specified. This helps your users narrow their search.
 - `"PageNumber"`: Query results are returned in pages the size of the PageSize parameter.
   By default, Amazon Kendra returns the first page of results. Use this parameter to get
   result pages after the first one.
@@ -2100,8 +2092,9 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   than 100 results, only 100 are returned.
 - `"QueryResultTypeFilter"`: Sets the type of query. Only results for the specified query
   type are returned.
+- `"QueryText"`: The text to search for.
 - `"RequestedDocumentAttributes"`: An array of document attributes to include in the
-  response. No other document attributes are included in the response. By default all
+  response. You can limit the response to include certain document attributes. By default all
   document attributes are included in the response.
 - `"SortingConfiguration"`: Provides information that determines how the results of the
   query are sorted. You can set the field that Amazon Kendra should sort the results on, and
@@ -2109,34 +2102,26 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   of ties in sorting the results, the results are sorted by relevance. If you don't provide
   sorting configuration, the results are sorted by the relevance that Amazon Kendra
   determines for the result.
+- `"SpellCorrectionConfiguration"`: Enables suggested spell corrections for queries.
 - `"UserContext"`: The user context token or user and group information.
 - `"VisitorId"`: Provides an identifier for a specific user. The VisitorId should be a
   unique identifier, such as a GUID. Don't use personally identifiable information, such as
   the user's email address, as the VisitorId.
 """
-function query(IndexId, QueryText; aws_config::AbstractAWSConfig=global_aws_config())
+function query(IndexId; aws_config::AbstractAWSConfig=global_aws_config())
     return kendra(
         "Query",
-        Dict{String,Any}("IndexId" => IndexId, "QueryText" => QueryText);
+        Dict{String,Any}("IndexId" => IndexId);
         aws_config=aws_config,
         feature_set=SERVICE_FEATURE_SET,
     )
 end
 function query(
-    IndexId,
-    QueryText,
-    params::AbstractDict{String};
-    aws_config::AbstractAWSConfig=global_aws_config(),
+    IndexId, params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
 )
     return kendra(
         "Query",
-        Dict{String,Any}(
-            mergewith(
-                _merge,
-                Dict{String,Any}("IndexId" => IndexId, "QueryText" => QueryText),
-                params,
-            ),
-        );
+        Dict{String,Any}(mergewith(_merge, Dict{String,Any}("IndexId" => IndexId), params));
         aws_config=aws_config,
         feature_set=SERVICE_FEATURE_SET,
     )
@@ -2184,7 +2169,8 @@ end
     stop_data_source_sync_job(id, index_id)
     stop_data_source_sync_job(id, index_id, params::Dict{String,<:Any})
 
-Stops a running synchronization job. You can't stop a scheduled synchronization job.
+Stops a synchronization job that is currently running. You can't stop a scheduled
+synchronization job.
 
 # Arguments
 - `id`: The identifier of the data source for which to stop the synchronization jobs.
@@ -2228,7 +2214,7 @@ region.
 # Arguments
 - `index_id`: The identifier of the index that was queried.
 - `query_id`: The identifier of the specific query for which you are submitting feedback.
-  The query ID is returned in the response to the Query operation.
+  The query ID is returned in the response to the Query API.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -2361,7 +2347,8 @@ Updates an existing Amazon Kendra data source.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"Configuration"`: Configuration information for an Amazon Kendra data source.
+- `"Configuration"`: Configuration information for an Amazon Kendra data source you want to
+  update.
 - `"CustomDocumentEnrichmentConfiguration"`: Configuration information for altering
   document metadata and content during the document ingestion process when you update a data
   source. For more information on how to create, modify and delete document metadata, or make
@@ -2416,15 +2403,12 @@ creating a search application experience, see Building a search experience with 
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"Configuration"`: Provides the user configuration information. This includes the Amazon
-  Web Services SSO field name that contains the identifiers of your users, such as their
-  emails.
+- `"Configuration"`: Configuration information for your Amazon Kendra you want to update.
 - `"Description"`: The description of your Amazon Kendra experience you want to update.
 - `"Name"`: The name of your Amazon Kendra experience you want to update.
 - `"RoleArn"`: The Amazon Resource Name (ARN) of a role with permission to access Query
-  operations, QuerySuggestions operations, SubmitFeedback operations, and Amazon Web Services
-  SSO that stores your user and group information. For more information, see IAM roles for
-  Amazon Kendra.
+  API, QuerySuggestions API, SubmitFeedback API, and Amazon Web Services SSO that stores your
+  user and group information. For more information, see IAM roles for Amazon Kendra.
 """
 function update_experience(Id, IndexId; aws_config::AbstractAWSConfig=global_aws_config())
     return kendra(
@@ -2461,12 +2445,12 @@ Updates an existing Amazon Kendra index.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"CapacityUnits"`: Sets the number of additional storage and query capacity units that
-  should be used by the index. You can change the capacity of the index up to 5 times per
-  day. If you are using extra storage units, you can't reduce the storage capacity below that
-  required to meet the storage needs for your index.
+- `"CapacityUnits"`: Sets the number of additional document storage and query capacity
+  units that should be used by the index. You can change the capacity of the index up to 5
+  times per day, or make 5 API calls. If you are using extra storage units, you can't reduce
+  the storage capacity below what is required to meet the storage needs for your index.
 - `"Description"`: A new description for the index.
-- `"DocumentMetadataConfigurationUpdates"`: The document metadata to update.
+- `"DocumentMetadataConfigurationUpdates"`: The document metadata you want to update.
 - `"Name"`: The name of the index to update.
 - `"RoleArn"`: A new IAM role that gives Amazon Kendra permission to access your Amazon
   CloudWatch logs.

@@ -2667,20 +2667,20 @@ end
 
 Generates a report that includes details about when an IAM resource (user, group, role, or
 policy) was last used in an attempt to access Amazon Web Services services. Recent activity
-usually appears within four hours. IAM reports activity for the last 365 days, or less if
-your Region began supporting this feature within the last year. For more information, see
-Regions where data is tracked.  The service last accessed data includes all attempts to
-access an Amazon Web Services API, not just the successful ones. This includes all attempts
-that were made using the Amazon Web Services Management Console, the Amazon Web Services
-API through any of the SDKs, or any of the command line tools. An unexpected entry in the
-service last accessed data does not mean that your account has been compromised, because
-the request might have been denied. Refer to your CloudTrail logs as the authoritative
-source for information about all API calls and whether they were successful or denied
-access. For more information, see Logging IAM events with CloudTrail in the IAM User
-Guide.  The GenerateServiceLastAccessedDetails operation returns a JobId. Use this
-parameter in the following operations to retrieve the following details from your report:
-  GetServiceLastAccessedDetails – Use this operation for users, groups, roles, or
-policies to list every Amazon Web Services service that the resource could access using
+usually appears within four hours. IAM reports activity for at least the last 400 days, or
+less if your Region began supporting this feature within the last year. For more
+information, see Regions where data is tracked.  The service last accessed data
+includes all attempts to access an Amazon Web Services API, not just the successful ones.
+This includes all attempts that were made using the Amazon Web Services Management Console,
+the Amazon Web Services API through any of the SDKs, or any of the command line tools. An
+unexpected entry in the service last accessed data does not mean that your account has been
+compromised, because the request might have been denied. Refer to your CloudTrail logs as
+the authoritative source for information about all API calls and whether they were
+successful or denied access. For more information, see Logging IAM events with CloudTrail
+in the IAM User Guide.  The GenerateServiceLastAccessedDetails operation returns a JobId.
+Use this parameter in the following operations to retrieve the following details from your
+report:     GetServiceLastAccessedDetails – Use this operation for users, groups, roles,
+or policies to list every Amazon Web Services service that the resource could access using
 permissions policies. For each service, the response includes information about the most
 recent access attempt. The JobId returned by GenerateServiceLastAccessedDetail must be used
 by the same role within a session, or by the same user when used to call
@@ -5546,9 +5546,8 @@ status. If you do not specify an assignment status, the operation returns a list
 virtual MFA devices. Assignment status can be Assigned, Unassigned, or Any.  IAM
 resource-listing operations return a subset of the available attributes for the resource.
 For example, this operation does not return tags, even though they are an attribute of the
-returned object. To view all of the information for a virtual MFA device, see
-ListVirtualMFADevices.  You can paginate the results using the MaxItems and Marker
-parameters.
+returned object. To view tag information for a virtual MFA device, see ListMFADeviceTags.
+You can paginate the results using the MaxItems and Marker parameters.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -7542,27 +7541,34 @@ end
     update_account_password_policy()
     update_account_password_policy(params::Dict{String,<:Any})
 
-Updates the password policy settings for the Amazon Web Services account.    This operation
+Updates the password policy settings for the Amazon Web Services account.  This operation
 does not support partial updates. No parameters are required, but if you do not specify a
 parameter, that parameter's value reverts to its default value. See the Request Parameters
 section for each parameter's default value. Also note that some parameters do not allow the
 default parameter to be explicitly set. Instead, to invoke the default value, do not
-include that parameter when you invoke the operation.     For more information about using
-a password policy, see Managing an IAM password policy in the IAM User Guide.
+include that parameter when you invoke the operation.   For more information about using a
+password policy, see Managing an IAM password policy in the IAM User Guide.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"AllowUsersToChangePassword"`:  Allows all IAM users in your account to use the Amazon
   Web Services Management Console to change their own passwords. For more information, see
-  Letting IAM users change their own passwords in the IAM User Guide. If you do not specify a
-  value for this parameter, then the operation uses the default value of false. The result is
-  that IAM users in the account do not automatically have permissions to change their own
-  password.
-- `"HardExpiry"`: Prevents IAM users from setting a new password after their password has
-  expired. The IAM user cannot be accessed until an administrator resets the password. If you
-  do not specify a value for this parameter, then the operation uses the default value of
-  false. The result is that IAM users can change their passwords after they expire and
-  continue to sign in as the user.
+  Permitting IAM users to change their own passwords in the IAM User Guide. If you do not
+  specify a value for this parameter, then the operation uses the default value of false. The
+  result is that IAM users in the account do not automatically have permissions to change
+  their own password.
+- `"HardExpiry"`:  Prevents IAM users who are accessing the account via the Amazon Web
+  Services Management Console from setting a new console password after their password has
+  expired. The IAM user cannot access the console until an administrator resets the password.
+  If you do not specify a value for this parameter, then the operation uses the default value
+  of false. The result is that IAM users can change their passwords after they expire and
+  continue to sign in as the user.   In the Amazon Web Services Management Console, the
+  custom password policy option Allow users to change their own password gives IAM users
+  permissions to iam:ChangePassword for only their user and to the
+  iam:GetAccountPasswordPolicy action. This option does not attach a permissions policy to
+  each user, rather the permissions are applied at the account-level for all users by IAM.
+  IAM users with iam:ChangePassword permission and active access keys can reset their own
+  expired console password using the CLI or API.
 - `"MaxPasswordAge"`: The number of days that an IAM user password is valid. If you do not
   specify a value for this parameter, then the operation uses the default value of 0. The
   result is that IAM user passwords never expire.

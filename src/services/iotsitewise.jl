@@ -223,6 +223,128 @@ function batch_disassociate_project_assets(
 end
 
 """
+    batch_get_asset_property_aggregates(entries)
+    batch_get_asset_property_aggregates(entries, params::Dict{String,<:Any})
+
+Gets aggregated values (for example, average, minimum, and maximum) for one or more asset
+properties. For more information, see Querying aggregates in the IoT SiteWise User Guide.
+
+# Arguments
+- `entries`: The list of asset property aggregate entries for the batch get request. You
+  can specify up to 16 entries per request.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"maxResults"`: The maximum number of results to return for each paginated request. A
+  result set is returned in the two cases, whichever occurs first.   The size of the result
+  set is less than 1 MB.   The number of data points in the result set is less than the value
+  of maxResults. The maximum value of maxResults is 4000.
+- `"nextToken"`: The token to be used for the next set of paginated results.
+"""
+function batch_get_asset_property_aggregates(
+    entries; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return iotsitewise(
+        "POST",
+        "/properties/batch/aggregates",
+        Dict{String,Any}("entries" => entries);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function batch_get_asset_property_aggregates(
+    entries, params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return iotsitewise(
+        "POST",
+        "/properties/batch/aggregates",
+        Dict{String,Any}(mergewith(_merge, Dict{String,Any}("entries" => entries), params));
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    batch_get_asset_property_value(entries)
+    batch_get_asset_property_value(entries, params::Dict{String,<:Any})
+
+Gets the current value for one or more asset properties. For more information, see Querying
+current values in the IoT SiteWise User Guide.
+
+# Arguments
+- `entries`: The list of asset property value entries for the batch get request. You can
+  specify up to 16 entries per request.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"nextToken"`: The token to be used for the next set of paginated results.
+"""
+function batch_get_asset_property_value(
+    entries; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return iotsitewise(
+        "POST",
+        "/properties/batch/latest",
+        Dict{String,Any}("entries" => entries);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function batch_get_asset_property_value(
+    entries, params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return iotsitewise(
+        "POST",
+        "/properties/batch/latest",
+        Dict{String,Any}(mergewith(_merge, Dict{String,Any}("entries" => entries), params));
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    batch_get_asset_property_value_history(entries)
+    batch_get_asset_property_value_history(entries, params::Dict{String,<:Any})
+
+Gets the historical values for one or more asset properties. For more information, see
+Querying historical values in the IoT SiteWise User Guide.
+
+# Arguments
+- `entries`: The list of asset property historical value entries for the batch get request.
+  You can specify up to 16 entries per request.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"maxResults"`: The maximum number of results to return for each paginated request. A
+  result set is returned in the two cases, whichever occurs first.   The size of the result
+  set is less than 1 MB.   The number of data points in the result set is less than the value
+  of maxResults. The maximum value of maxResults is 4000.
+- `"nextToken"`: The token to be used for the next set of paginated results.
+"""
+function batch_get_asset_property_value_history(
+    entries; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return iotsitewise(
+        "POST",
+        "/properties/batch/history",
+        Dict{String,Any}("entries" => entries);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function batch_get_asset_property_value_history(
+    entries, params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return iotsitewise(
+        "POST",
+        "/properties/batch/history",
+        Dict{String,Any}(mergewith(_merge, Dict{String,Any}("entries" => entries), params));
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     batch_put_asset_property_value(entries)
     batch_put_asset_property_value(entries, params::Dict{String,<:Any})
 

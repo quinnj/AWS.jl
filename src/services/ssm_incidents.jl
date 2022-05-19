@@ -120,8 +120,7 @@ incident. You can create custom timeline events to mark important events that ar
 automatically detected by Incident Manager.
 
 # Arguments
-- `event_data`: A short description of the event as a valid JSON string. There is no other
-  schema imposed.
+- `event_data`: A short description of the event.
 - `event_time`: The time that the event occurred.
 - `event_type`: The type of the event. You can create timeline events of type Custom Event.
 - `incident_record_arn`: The Amazon Resource Name (ARN) of the incident record to which the
@@ -785,7 +784,9 @@ end
     put_resource_policy(policy, resource_arn)
     put_resource_policy(policy, resource_arn, params::Dict{String,<:Any})
 
-Adds a resource policy to the specified response plan.
+Adds a resource policy to the specified response plan. The resource policy is used to share
+the response plan using Resource Access Manager (RAM). For more information about
+cross-account sharing, see Setting up cross-account functionality.
 
 # Arguments
 - `policy`: Details of the resource policy.

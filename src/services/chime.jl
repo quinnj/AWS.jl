@@ -589,7 +589,7 @@ AWS API Standard.
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"Metadata"`: The metadata of the AppInstance. Limited to a 1KB string in UTF-8.
-- `"Tags"`: Tags assigned to the AppInstanceUser.
+- `"Tags"`: Tags assigned to the AppInstance.
 """
 function create_app_instance(
     ClientRequestToken, Name; aws_config::AbstractAWSConfig=global_aws_config()
@@ -7394,8 +7394,8 @@ end
     update_sip_media_application_call(arguments, sip_media_application_id, transaction_id)
     update_sip_media_application_call(arguments, sip_media_application_id, transaction_id, params::Dict{String,<:Any})
 
-Allows you to trigger a Lambda function at any time while a call is active, and replace the
-current actions with new actions returned by the invocation.
+Invokes the AWS Lambda function associated with the SIP media application and transaction
+ID in an update request. The Lambda function can then return a new set of actions.
 
 # Arguments
 - `arguments`: Arguments made available to the Lambda function as part of the

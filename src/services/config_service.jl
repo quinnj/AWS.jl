@@ -401,15 +401,15 @@ end
     delete_organization_config_rule(organization_config_rule_name)
     delete_organization_config_rule(organization_config_rule_name, params::Dict{String,<:Any})
 
-Deletes the specified organization config rule and all of its evaluation results from all
+Deletes the specified organization Config rule and all of its evaluation results from all
 member accounts in that organization.  Only a master account and a delegated administrator
-account can delete an organization config rule. When calling this API with a delegated
+account can delete an organization Config rule. When calling this API with a delegated
 administrator, you must ensure Organizations ListDelegatedAdministrator permissions are
 added. Config sets the state of a rule to DELETE_IN_PROGRESS until the deletion is
 complete. You cannot update a rule while it is in this state.
 
 # Arguments
-- `organization_config_rule_name`: The name of organization config rule that you want to
+- `organization_config_rule_name`: The name of organization Config rule that you want to
   delete.
 
 """
@@ -448,7 +448,7 @@ end
     delete_organization_conformance_pack(organization_conformance_pack_name)
     delete_organization_conformance_pack(organization_conformance_pack_name, params::Dict{String,<:Any})
 
-Deletes the specified organization conformance pack and all of the config rules and
+Deletes the specified organization conformance pack and all of the Config rules and
 remediation actions from all member accounts in that organization.   Only a master account
 or a delegated administrator account can delete an organization conformance pack. When
 calling this API with a delegated administrator, you must ensure Organizations
@@ -1438,12 +1438,12 @@ end
     describe_organization_config_rule_statuses()
     describe_organization_config_rule_statuses(params::Dict{String,<:Any})
 
-Provides organization config rule deployment status for an organization.  The status is not
-considered successful until organization config rule is successfully deployed in all the
+Provides organization Config rule deployment status for an organization.  The status is not
+considered successful until organization Config rule is successfully deployed in all the
 member accounts with an exception of excluded accounts. When you specify the limit and the
 next token, you receive a paginated response. Limit and next token are not applicable if
-you specify organization config rule names. It is only applicable, when you request all the
-organization config rules.
+you specify organization Config rule names. It is only applicable, when you request all the
+organization Config rules.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -1451,7 +1451,7 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   you do no specify a number, Config uses the default. The default is 100.
 - `"NextToken"`: The nextToken string returned on a previous page that you use to get the
   next page of results in a paginated response.
-- `"OrganizationConfigRuleNames"`: The names of organization config rules for which you
+- `"OrganizationConfigRuleNames"`: The names of organization Config rules for which you
   want status details. If you do not specify any names, Config returns details for all your
   organization Config rules.
 """
@@ -1479,20 +1479,20 @@ end
     describe_organization_config_rules()
     describe_organization_config_rules(params::Dict{String,<:Any})
 
-Returns a list of organization config rules.   When you specify the limit and the next
+Returns a list of organization Config rules.   When you specify the limit and the next
 token, you receive a paginated response. Limit and next token are not applicable if you
-specify organization config rule names. It is only applicable, when you request all the
-organization config rules.
+specify organization Config rule names. It is only applicable, when you request all the
+organization Config rules.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
-- `"Limit"`: The maximum number of organization config rules returned on each page. If you
+- `"Limit"`: The maximum number of organization Config rules returned on each page. If you
   do no specify a number, Config uses the default. The default is 100.
 - `"NextToken"`: The nextToken string returned on a previous page that you use to get the
   next page of results in a paginated response.
-- `"OrganizationConfigRuleNames"`: The names of organization config rules for which you
+- `"OrganizationConfigRuleNames"`: The names of organization Config rules for which you
   want details. If you do not specify any names, Config returns details for all your
-  organization config rules.
+  organization Config rules.
 """
 function describe_organization_config_rules(;
     aws_config::AbstractAWSConfig=global_aws_config()
@@ -2338,6 +2338,32 @@ function get_conformance_pack_compliance_summary(
 end
 
 """
+    get_custom_rule_policy()
+    get_custom_rule_policy(params::Dict{String,<:Any})
+
+Returns the policy definition containing the logic for your Config Custom Policy rule.
+
+# Optional Parameters
+Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"ConfigRuleName"`: The name of your Config Custom Policy rule.
+"""
+function get_custom_rule_policy(; aws_config::AbstractAWSConfig=global_aws_config())
+    return config_service(
+        "GetCustomRulePolicy"; aws_config=aws_config, feature_set=SERVICE_FEATURE_SET
+    )
+end
+function get_custom_rule_policy(
+    params::AbstractDict{String}; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return config_service(
+        "GetCustomRulePolicy",
+        params;
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     get_discovered_resource_counts()
     get_discovered_resource_counts(params::Dict{String,<:Any})
 
@@ -2395,11 +2421,11 @@ end
     get_organization_config_rule_detailed_status(organization_config_rule_name, params::Dict{String,<:Any})
 
 Returns detailed status for each member account within an organization for a given
-organization config rule.
+organization Config rule.
 
 # Arguments
-- `organization_config_rule_name`: The name of organization config rule for which you want
-  status details for member accounts.
+- `organization_config_rule_name`: The name of your organization Config rule for which you
+  want status details for member accounts.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
@@ -2483,6 +2509,48 @@ function get_organization_conformance_pack_detailed_status(
                 _merge,
                 Dict{String,Any}(
                     "OrganizationConformancePackName" => OrganizationConformancePackName
+                ),
+                params,
+            ),
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    get_organization_custom_rule_policy(organization_config_rule_name)
+    get_organization_custom_rule_policy(organization_config_rule_name, params::Dict{String,<:Any})
+
+Returns the policy definition containing the logic for your organization Config Custom
+Policy rule.
+
+# Arguments
+- `organization_config_rule_name`: The name of your organization Config Custom Policy rule.
+
+"""
+function get_organization_custom_rule_policy(
+    OrganizationConfigRuleName; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return config_service(
+        "GetOrganizationCustomRulePolicy",
+        Dict{String,Any}("OrganizationConfigRuleName" => OrganizationConfigRuleName);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function get_organization_custom_rule_policy(
+    OrganizationConfigRuleName,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return config_service(
+        "GetOrganizationCustomRulePolicy",
+        Dict{String,Any}(
+            mergewith(
+                _merge,
+                Dict{String,Any}(
+                    "OrganizationConfigRuleName" => OrganizationConfigRuleName
                 ),
                 params,
             ),
@@ -2842,10 +2910,10 @@ end
     put_config_rule(config_rule, params::Dict{String,<:Any})
 
 Adds or updates an Config rule for evaluating whether your Amazon Web Services resources
-comply with your desired configurations. You can use this action for custom Config rules
-and Config managed rules. A custom Config rule is a rule that you develop and maintain. An
+comply with your desired configurations. You can use this action for Config custom rules
+and Config managed rules. A Config custom rule is a rule that you develop and maintain. An
 Config managed rule is a customizable, predefined rule that Config provides. If you are
-adding a new custom Config rule, you must first create the Lambda function that the rule
+adding a new Config custom rule, you must first create the Lambda function that the rule
 invokes to evaluate your resources. When you use the PutConfigRule action to add the rule
 to Config, you must specify the Amazon Resource Name (ARN) that Lambda assigns to the
 function. Specify the ARN for the SourceIdentifier key. This key is part of the Source
@@ -2898,11 +2966,11 @@ end
 Creates and updates the configuration aggregator with the selected source accounts and
 regions. The source account can be individual account(s) or an organization.  accountIds
 that are passed will be replaced with existing accounts. If you want to add additional
-accounts into the aggregator, call DescribeAggregator to get the previous accounts and then
-append new ones.  Config should be enabled in source accounts and regions you want to
-aggregate. If your source type is an organization, you must be signed in to the management
-account or a registered delegated administrator and all the features must be enabled in
-your organization. If the caller is a management account, Config calls
+accounts into the aggregator, call DescribeConfigurationAggregators to get the previous
+accounts and then append new ones.  Config should be enabled in source accounts and regions
+you want to aggregate. If your source type is an organization, you must be signed in to the
+management account or a registered delegated administrator and all the features must be
+enabled in your organization. If the caller is a management account, Config calls
 EnableAwsServiceAccess API to enable integration between Config and Organizations. If the
 caller is a registered delegated administrator, Config calls ListDelegatedAdministrators
 API to verify whether the caller is a valid delegated administrator. To register a
@@ -3017,8 +3085,8 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"DeliveryS3KeyPrefix"`: The prefix for the Amazon S3 bucket.   This field is optional.
 - `"TemplateBody"`: A string containing full conformance pack template body. Structure
   containing the template body with a minimum length of 1 byte and a maximum length of 51,200
-  bytes.  You can only use a YAML template with one resource type, that is, config rule and a
-  remediation action.
+  bytes.  You can only use a YAML template with two resource types: Config rule
+  (AWS::Config::ConfigRule) and a remediation action (AWS::Config::RemediationConfiguration).
 - `"TemplateS3Uri"`: Location of file containing the template body
   (s3://bucketname/prefix). The uri must point to the conformance pack template (max size:
   300 KB) that is located in an Amazon S3 bucket in the same region as the conformance pack.
@@ -3195,9 +3263,9 @@ end
     put_organization_config_rule(organization_config_rule_name)
     put_organization_config_rule(organization_config_rule_name, params::Dict{String,<:Any})
 
-Adds or updates organization config rule for your entire organization evaluating whether
+Adds or updates organization Config rule for your entire organization evaluating whether
 your Amazon Web Services resources comply with your desired configurations.  Only a master
-account and a delegated administrator can create or update an organization config rule.
+account and a delegated administrator can create or update an organization Config rule.
 When calling this API with a delegated administrator, you must ensure Organizations
 ListDelegatedAdministrator permissions are added.  This API enables organization service
 access through the EnableAWSServiceAccess action and creates a service linked role
@@ -3206,26 +3274,31 @@ of your organization. The service linked role is created only when the role does
 in the caller account. Config verifies the existence of role with GetRole action. To use
 this API with delegated administrator, register a delegated administrator by calling Amazon
 Web Services Organization register-delegated-administrator for
-config-multiaccountsetup.amazonaws.com.  You can use this action to create both custom
-Config rules and Config managed rules. If you are adding a new custom Config rule, you must
+config-multiaccountsetup.amazonaws.com.  You can use this action to create both Config
+custom rules and Config managed rules. If you are adding a new Config custom rule, you must
 first create Lambda function in the master account or a delegated administrator that the
 rule invokes to evaluate your resources. You also need to create an IAM role in the
 managed-account that can be assumed by the Lambda function. When you use the
 PutOrganizationConfigRule action to add the rule to Config, you must specify the Amazon
 Resource Name (ARN) that Lambda assigns to the function. If you are adding an Config
 managed rule, specify the rule's identifier for the RuleIdentifier key. The maximum number
-of organization config rules that Config supports is 150 and 3 delegated administrator per
+of organization Config rules that Config supports is 150 and 3 delegated administrator per
 organization.   Prerequisite: Ensure you call EnableAllFeatures API to enable all features
 in an organization. Specify either OrganizationCustomRuleMetadata or
 OrganizationManagedRuleMetadata.
 
 # Arguments
-- `organization_config_rule_name`: The name that you assign to an organization config rule.
+- `organization_config_rule_name`: The name that you assign to an organization Config rule.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
 - `"ExcludedAccounts"`: A comma-separated list of accounts that you want to exclude from an
-  organization config rule.
+  organization Config rule.
+- `"OrganizationCustomPolicyRuleMetadata"`: An object that specifies metadata for your
+  organization's Config Custom Policy rule. The metadata includes the runtime system in use,
+  which accounts have debug logging enabled, and other custom rule metadata, such as resource
+  type, resource ID of Amazon Web Services resource, and organization trigger types that
+  initiate Config to evaluate Amazon Web Services resources against a rule.
 - `"OrganizationCustomRuleMetadata"`: An OrganizationCustomRuleMetadata object.
 - `"OrganizationManagedRuleMetadata"`: An OrganizationManagedRuleMetadata object.
 """

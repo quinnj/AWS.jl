@@ -319,16 +319,18 @@ end
 
 Completes the lifecycle action for the specified token or instance with the specified
 result. This step is a part of the procedure for adding a lifecycle hook to an Auto Scaling
-group:   (Optional) Create a Lambda function and a rule that allows Amazon EventBridge to
-invoke your Lambda function when Amazon EC2 Auto Scaling launches or terminates instances.
- (Optional) Create a notification target and an IAM role. The target can be either an
-Amazon SQS queue or an Amazon SNS topic. The role allows Amazon EC2 Auto Scaling to publish
-lifecycle notifications to the target.   Create the lifecycle hook. Specify whether the
-hook is used when the instances launch or terminate.   If you need more time, record the
-lifecycle action heartbeat to keep the instance in a pending state.    If you finish before
-the timeout period ends, send a callback by using the CompleteLifecycleAction API call.
-For more information, see Amazon EC2 Auto Scaling lifecycle hooks in the Amazon EC2 Auto
-Scaling User Guide.
+group:   (Optional) Create a launch template or launch configuration with a user data
+script that runs while an instance is in a wait state due to a lifecycle hook.   (Optional)
+Create a Lambda function and a rule that allows Amazon EventBridge to invoke your Lambda
+function when an instance is put into a wait state due to a lifecycle hook.   (Optional)
+Create a notification target and an IAM role. The target can be either an Amazon SQS queue
+or an Amazon SNS topic. The role allows Amazon EC2 Auto Scaling to publish lifecycle
+notifications to the target.   Create the lifecycle hook. Specify whether the hook is used
+when the instances launch or terminate.   If you need more time, record the lifecycle
+action heartbeat to keep the instance in a wait state.    If you finish before the timeout
+period ends, send a callback by using the CompleteLifecycleAction API call.    For more
+information, see Amazon EC2 Auto Scaling lifecycle hooks in the Amazon EC2 Auto Scaling
+User Guide.
 
 # Arguments
 - `auto_scaling_group_name`: The name of the Auto Scaling group.
@@ -426,11 +428,23 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   terminates an old instance. For more information, see Amazon EC2 Auto Scaling Capacity
   Rebalancing in the Amazon EC2 Auto Scaling User Guide.
 - `"Context"`: Reserved.
-- `"DefaultCooldown"`: The amount of time, in seconds, after a scaling activity completes
-  before another scaling activity can start. The default value is 300. This setting applies
-  when using simple scaling policies, but not when using other scaling policies or scheduled
-  scaling. For more information, see Scaling cooldowns for Amazon EC2 Auto Scaling in the
-  Amazon EC2 Auto Scaling User Guide.
+- `"DefaultCooldown"`:  Only needed if you use simple scaling policies.  The amount of
+  time, in seconds, between one scaling activity ending and another one starting due to
+  simple scaling policies. For more information, see Scaling cooldowns for Amazon EC2 Auto
+  Scaling in the Amazon EC2 Auto Scaling User Guide. Default: 300 seconds
+- `"DefaultInstanceWarmup"`: The amount of time, in seconds, until a newly launched
+  instance can contribute to the Amazon CloudWatch metrics. This delay lets an instance
+  finish initializing before Amazon EC2 Auto Scaling aggregates instance metrics, resulting
+  in more reliable usage data. Set this value equal to the amount of time that it takes for
+  resource consumption to become stable after an instance reaches the InService state. For
+  more information, see Set the default instance warmup for an Auto Scaling group in the
+  Amazon EC2 Auto Scaling User Guide.  To manage your warm-up settings at the group level, we
+  recommend that you set the default instance warmup, even if its value is set to 0 seconds.
+  This also optimizes the performance of scaling policies that scale continuously, such as
+  target tracking and step scaling policies.  If you need to remove a value that you
+  previously set, include the property but specify -1 for the value. However, we strongly
+  recommend keeping the default instance warmup enabled by specifying a minimum value of 0.
+  Default: None
 - `"DesiredCapacity"`: The desired capacity is the initial capacity of the Auto Scaling
   group at the time of its creation and the capacity it attempts to maintain. It can scale
   beyond this capacity if you configure auto scaling. This number must be greater than or
@@ -443,11 +457,12 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   attribute-based instance type selection in the Amazon EC2 Auto Scaling User Guide. By
   default, Amazon EC2 Auto Scaling specifies units, which translates into number of
   instances. Valid values: units | vcpu | memory-mib
-- `"HealthCheckGracePeriod"`: The amount of time, in seconds, that Amazon EC2 Auto Scaling
-  waits before checking the health status of an EC2 instance that has come into service and
-  marking it unhealthy due to a failed health check. The default value is 0. For more
-  information, see Health check grace period in the Amazon EC2 Auto Scaling User Guide.
-  Conditional: Required if you are adding an ELB health check.
+- `"HealthCheckGracePeriod"`:    The amount of time, in seconds, that Amazon EC2 Auto
+  Scaling waits before checking the health status of an EC2 instance that has come into
+  service and marking it unhealthy due to a failed Elastic Load Balancing or custom health
+  check. This is useful if your instances do not immediately pass these health checks after
+  they enter the InService state. For more information, see Health check grace period in the
+  Amazon EC2 Auto Scaling User Guide. Default: 0 seconds
 - `"HealthCheckType"`: The service to use for the health checks. The valid values are EC2
   (default) and ELB. If you configure an Auto Scaling group to use load balancer (ELB) health
   checks, it considers the instance unhealthy if it fails either the EC2 status checks or the
@@ -484,9 +499,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   about preventing instances from terminating on scale in, see Using instance scale-in
   protection in the Amazon EC2 Auto Scaling User Guide.
 - `"PlacementGroup"`: The name of an existing placement group into which to launch your
-  instances, if any. A placement group is a logical grouping of instances within a single
-  Availability Zone. You cannot specify multiple Availability Zones and a placement group.
-  For more information, see Placement Groups in the Amazon EC2 User Guide for Linux Instances.
+  instances. For more information, see Placement groups in the Amazon EC2 User Guide for
+  Linux Instances.  A cluster placement group is a logical grouping of instances within a
+  single Availability Zone. You cannot specify multiple Availability Zones and a cluster
+  placement group.
 - `"ServiceLinkedRoleARN"`: The Amazon Resource Name (ARN) of the service-linked role that
   the Auto Scaling group uses to call other Amazon Web Services on your behalf. By default,
   Amazon EC2 Auto Scaling uses a service-linked role named AWSServiceRoleForAutoScaling,
@@ -584,15 +600,15 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"BlockDeviceMappings"`: A block device mapping, which specifies the block devices for
   the instance. You can specify virtual devices and EBS volumes. For more information, see
   Block Device Mapping in the Amazon EC2 User Guide for Linux Instances.
-- `"ClassicLinkVPCId"`: The ID of a ClassicLink-enabled VPC to link your EC2-Classic
+- `"ClassicLinkVPCId"`:  EC2-Classic retires on August 15, 2022. This parameter is not
+  supported after that date.  The ID of a ClassicLink-enabled VPC to link your EC2-Classic
   instances to. For more information, see ClassicLink in the Amazon EC2 User Guide for Linux
-  Instances and Linking EC2-Classic instances to a VPC in the Amazon EC2 Auto Scaling User
-  Guide. This parameter can only be used if you are launching EC2-Classic instances.
-- `"ClassicLinkVPCSecurityGroups"`: The IDs of one or more security groups for the
-  specified ClassicLink-enabled VPC. For more information, see ClassicLink in the Amazon EC2
-  User Guide for Linux Instances and Linking EC2-Classic instances to a VPC in the Amazon EC2
-  Auto Scaling User Guide. If you specify the ClassicLinkVPCId parameter, you must specify
-  this parameter.
+  Instances.
+- `"ClassicLinkVPCSecurityGroups"`:  EC2-Classic retires on August 15, 2022. This parameter
+  is not supported after that date.  The IDs of one or more security groups for the specified
+  ClassicLink-enabled VPC. For more information, see ClassicLink in the Amazon EC2 User Guide
+  for Linux Instances. If you specify the ClassicLinkVPCId parameter, you must specify this
+  parameter.
 - `"EbsOptimized"`: Specifies whether the launch configuration is optimized for EBS I/O
   (true) or not (false). The optimization provides dedicated throughput to Amazon EBS and an
   optimized configuration stack to provide optimal I/O performance. This optimization is not
@@ -2314,17 +2330,19 @@ end
     put_lifecycle_hook(auto_scaling_group_name, lifecycle_hook_name)
     put_lifecycle_hook(auto_scaling_group_name, lifecycle_hook_name, params::Dict{String,<:Any})
 
-Creates or updates a lifecycle hook for the specified Auto Scaling group. A lifecycle hook
-enables an Auto Scaling group to be aware of events in the Auto Scaling instance lifecycle,
-and then perform a custom action when the corresponding lifecycle event occurs. This step
-is a part of the procedure for adding a lifecycle hook to an Auto Scaling group:
-(Optional) Create a Lambda function and a rule that allows Amazon EventBridge to invoke
-your Lambda function when Amazon EC2 Auto Scaling launches or terminates instances.
-(Optional) Create a notification target and an IAM role. The target can be either an Amazon
-SQS queue or an Amazon SNS topic. The role allows Amazon EC2 Auto Scaling to publish
-lifecycle notifications to the target.    Create the lifecycle hook. Specify whether the
-hook is used when the instances launch or terminate.    If you need more time, record the
-lifecycle action heartbeat to keep the instance in a pending state using the
+Creates or updates a lifecycle hook for the specified Auto Scaling group. Lifecycle hooks
+let you create solutions that are aware of events in the Auto Scaling instance lifecycle,
+and then perform a custom action on instances when the corresponding lifecycle event
+occurs. This step is a part of the procedure for adding a lifecycle hook to an Auto Scaling
+group:   (Optional) Create a launch template or launch configuration with a user data
+script that runs while an instance is in a wait state due to a lifecycle hook.   (Optional)
+Create a Lambda function and a rule that allows Amazon EventBridge to invoke your Lambda
+function when an instance is put into a wait state due to a lifecycle hook.   (Optional)
+Create a notification target and an IAM role. The target can be either an Amazon SQS queue
+or an Amazon SNS topic. The role allows Amazon EC2 Auto Scaling to publish lifecycle
+notifications to the target.    Create the lifecycle hook. Specify whether the hook is used
+when the instances launch or terminate.    If you need more time, record the lifecycle
+action heartbeat to keep the instance in a wait state using the
 RecordLifecycleActionHeartbeat API call.   If you finish before the timeout period ends,
 send a callback by using the CompleteLifecycleAction API call.   For more information, see
 Amazon EC2 Auto Scaling lifecycle hooks in the Amazon EC2 Auto Scaling User Guide. If you
@@ -2362,8 +2380,9 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   Auto Scaling sends it a test message. Test messages contain the following additional
   key-value pair: \"Event\": \"autoscaling:TEST_NOTIFICATION\".
 - `"RoleARN"`: The ARN of the IAM role that allows the Auto Scaling group to publish to the
-  specified notification target, for example, an Amazon SNS topic or an Amazon SQS queue.
-  Required for new lifecycle hooks, but optional when updating existing hooks.
+  specified notification target. Valid only if the notification target is an Amazon SNS topic
+  or an Amazon SQS queue. Required for new lifecycle hooks, but optional when updating
+  existing hooks.
 """
 function put_lifecycle_hook(
     AutoScalingGroupName,
@@ -2488,17 +2507,21 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   absolute number or a percentage). The valid values are ChangeInCapacity, ExactCapacity, and
   PercentChangeInCapacity. Required if the policy type is StepScaling or SimpleScaling. For
   more information, see Scaling adjustment types in the Amazon EC2 Auto Scaling User Guide.
-- `"Cooldown"`: The duration of the policy's cooldown period, in seconds. When a cooldown
-  period is specified here, it overrides the default cooldown period defined for the Auto
-  Scaling group. Valid only if the policy type is SimpleScaling. For more information, see
-  Scaling cooldowns for Amazon EC2 Auto Scaling in the Amazon EC2 Auto Scaling User Guide.
+- `"Cooldown"`: A cooldown period, in seconds, that applies to a specific simple scaling
+  policy. When a cooldown period is specified here, it overrides the default cooldown. Valid
+  only if the policy type is SimpleScaling. For more information, see Scaling cooldowns for
+  Amazon EC2 Auto Scaling in the Amazon EC2 Auto Scaling User Guide. Default: None
 - `"Enabled"`: Indicates whether the scaling policy is enabled or disabled. The default is
   enabled. For more information, see Disabling a scaling policy for an Auto Scaling group in
   the Amazon EC2 Auto Scaling User Guide.
-- `"EstimatedInstanceWarmup"`: The estimated time, in seconds, until a newly launched
-  instance can contribute to the CloudWatch metrics. If not provided, the default is to use
-  the value from the default cooldown period for the Auto Scaling group. Valid only if the
-  policy type is TargetTrackingScaling or StepScaling.
+- `"EstimatedInstanceWarmup"`:  Not needed if the default instance warmup is defined for
+  the group.  The estimated time, in seconds, until a newly launched instance can contribute
+  to the CloudWatch metrics. This warm-up period applies to instances launched due to a
+  specific target tracking or step scaling policy. When a warm-up period is specified here,
+  it overrides the default instance warmup. Valid only if the policy type is
+  TargetTrackingScaling or StepScaling.  The default is to use the value for the default
+  instance warmup defined for the group. If default instance warmup is null, then
+  EstimatedInstanceWarmup falls back to the value of default cooldown.
 - `"MetricAggregationType"`: The aggregation type for the CloudWatch metrics. The valid
   values are Minimum, Maximum, and Average. If the aggregation type is null, the value is
   treated as Average. Valid only if the policy type is StepScaling.
@@ -2668,6 +2691,9 @@ pool, you can delete it by calling the DeleteWarmPool API.
 
 # Optional Parameters
 Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys are:
+- `"InstanceReusePolicy"`: Indicates whether instances in the Auto Scaling group can be
+  returned to the warm pool on scale in. The default is to terminate instances in the Auto
+  Scaling group when the group scales in.
 - `"MaxGroupPreparedCapacity"`: Specifies the maximum number of instances that are allowed
   to be in the warm pool or in any state except Terminated for the Auto Scaling group. This
   is an optional property. Specify it only if you do not want the warm pool size to be
@@ -2723,16 +2749,18 @@ end
 Records a heartbeat for the lifecycle action associated with the specified token or
 instance. This extends the timeout by the length of time defined using the PutLifecycleHook
 API call. This step is a part of the procedure for adding a lifecycle hook to an Auto
-Scaling group:   (Optional) Create a Lambda function and a rule that allows Amazon
-EventBridge to invoke your Lambda function when Amazon EC2 Auto Scaling launches or
-terminates instances.   (Optional) Create a notification target and an IAM role. The target
-can be either an Amazon SQS queue or an Amazon SNS topic. The role allows Amazon EC2 Auto
-Scaling to publish lifecycle notifications to the target.   Create the lifecycle hook.
-Specify whether the hook is used when the instances launch or terminate.    If you need
-more time, record the lifecycle action heartbeat to keep the instance in a pending state.
- If you finish before the timeout period ends, send a callback by using the
-CompleteLifecycleAction API call.   For more information, see Amazon EC2 Auto Scaling
-lifecycle hooks in the Amazon EC2 Auto Scaling User Guide.
+Scaling group:   (Optional) Create a launch template or launch configuration with a user
+data script that runs while an instance is in a wait state due to a lifecycle hook.
+(Optional) Create a Lambda function and a rule that allows Amazon EventBridge to invoke
+your Lambda function when an instance is put into a wait state due to a lifecycle hook.
+(Optional) Create a notification target and an IAM role. The target can be either an Amazon
+SQS queue or an Amazon SNS topic. The role allows Amazon EC2 Auto Scaling to publish
+lifecycle notifications to the target.   Create the lifecycle hook. Specify whether the
+hook is used when the instances launch or terminate.    If you need more time, record the
+lifecycle action heartbeat to keep the instance in a wait state.    If you finish before
+the timeout period ends, send a callback by using the CompleteLifecycleAction API call.
+For more information, see Amazon EC2 Auto Scaling lifecycle hooks in the Amazon EC2 Auto
+Scaling User Guide.
 
 # Arguments
 - `auto_scaling_group_name`: The name of the Auto Scaling group.
@@ -3218,11 +3246,22 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
 - `"CapacityRebalance"`: Enables or disables Capacity Rebalancing. For more information,
   see Amazon EC2 Auto Scaling Capacity Rebalancing in the Amazon EC2 Auto Scaling User Guide.
 - `"Context"`: Reserved.
-- `"DefaultCooldown"`: The amount of time, in seconds, after a scaling activity completes
-  before another scaling activity can start. The default value is 300. This setting applies
-  when using simple scaling policies, but not when using other scaling policies or scheduled
-  scaling. For more information, see Scaling cooldowns for Amazon EC2 Auto Scaling in the
-  Amazon EC2 Auto Scaling User Guide.
+- `"DefaultCooldown"`:  Only needed if you use simple scaling policies.  The amount of
+  time, in seconds, between one scaling activity ending and another one starting due to
+  simple scaling policies. For more information, see Scaling cooldowns for Amazon EC2 Auto
+  Scaling in the Amazon EC2 Auto Scaling User Guide.
+- `"DefaultInstanceWarmup"`: The amount of time, in seconds, until a newly launched
+  instance can contribute to the Amazon CloudWatch metrics. This delay lets an instance
+  finish initializing before Amazon EC2 Auto Scaling aggregates instance metrics, resulting
+  in more reliable usage data. Set this value equal to the amount of time that it takes for
+  resource consumption to become stable after an instance reaches the InService state. For
+  more information, see Set the default instance warmup for an Auto Scaling group in the
+  Amazon EC2 Auto Scaling User Guide.  To manage your warm-up settings at the group level, we
+  recommend that you set the default instance warmup, even if its value is set to 0 seconds.
+  This also optimizes the performance of scaling policies that scale continuously, such as
+  target tracking and step scaling policies.  If you need to remove a value that you
+  previously set, include the property but specify -1 for the value. However, we strongly
+  recommend keeping the default instance warmup enabled by specifying a minimum value of 0.
 - `"DesiredCapacity"`: The desired capacity is the initial capacity of the Auto Scaling
   group after this operation completes and the capacity it attempts to maintain. This number
   must be greater than or equal to the minimum size of the group and less than or equal to
@@ -3235,9 +3274,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   instances. Valid values: units | vcpu | memory-mib
 - `"HealthCheckGracePeriod"`: The amount of time, in seconds, that Amazon EC2 Auto Scaling
   waits before checking the health status of an EC2 instance that has come into service and
-  marking it unhealthy due to a failed health check. The default value is 0. For more
-  information, see Health check grace period in the Amazon EC2 Auto Scaling User Guide.
-  Conditional: Required if you are adding an ELB health check.
+  marking it unhealthy due to a failed Elastic Load Balancing or custom health check. This is
+  useful if your instances do not immediately pass these health checks after they enter the
+  InService state. For more information, see Health check grace period in the Amazon EC2 Auto
+  Scaling User Guide.
 - `"HealthCheckType"`: The service to use for the health checks. The valid values are EC2
   and ELB. If you configure an Auto Scaling group to use ELB health checks, it considers the
   instance unhealthy if it fails either the EC2 status checks or the load balancer health
@@ -3267,9 +3307,10 @@ Optional parameters can be passed as a `params::Dict{String,<:Any}`. Valid keys 
   about preventing instances from terminating on scale in, see Using instance scale-in
   protection in the Amazon EC2 Auto Scaling User Guide.
 - `"PlacementGroup"`: The name of an existing placement group into which to launch your
-  instances, if any. A placement group is a logical grouping of instances within a single
-  Availability Zone. You cannot specify multiple Availability Zones and a placement group.
-  For more information, see Placement Groups in the Amazon EC2 User Guide for Linux Instances.
+  instances. For more information, see Placement groups in the Amazon EC2 User Guide for
+  Linux Instances.  A cluster placement group is a logical grouping of instances within a
+  single Availability Zone. You cannot specify multiple Availability Zones and a cluster
+  placement group.
 - `"ServiceLinkedRoleARN"`: The Amazon Resource Name (ARN) of the service-linked role that
   the Auto Scaling group uses to call other Amazon Web Services on your behalf. For more
   information, see Service-linked roles in the Amazon EC2 Auto Scaling User Guide.

@@ -279,6 +279,45 @@ function create_metric_set(
 end
 
 """
+    deactivate_anomaly_detector(anomaly_detector_arn)
+    deactivate_anomaly_detector(anomaly_detector_arn, params::Dict{String,<:Any})
+
+Deactivates an anomaly detector.
+
+# Arguments
+- `anomaly_detector_arn`: The Amazon Resource Name (ARN) of the anomaly detector.
+
+"""
+function deactivate_anomaly_detector(
+    AnomalyDetectorArn; aws_config::AbstractAWSConfig=global_aws_config()
+)
+    return lookoutmetrics(
+        "POST",
+        "/DeactivateAnomalyDetector",
+        Dict{String,Any}("AnomalyDetectorArn" => AnomalyDetectorArn);
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function deactivate_anomaly_detector(
+    AnomalyDetectorArn,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return lookoutmetrics(
+        "POST",
+        "/DeactivateAnomalyDetector",
+        Dict{String,Any}(
+            mergewith(
+                _merge, Dict{String,Any}("AnomalyDetectorArn" => AnomalyDetectorArn), params
+            ),
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
     delete_alert(alert_arn)
     delete_alert(alert_arn, params::Dict{String,<:Any})
 
@@ -509,6 +548,57 @@ function describe_metric_set(
         "/DescribeMetricSet",
         Dict{String,Any}(
             mergewith(_merge, Dict{String,Any}("MetricSetArn" => MetricSetArn), params)
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+
+"""
+    detect_metric_set_config(anomaly_detector_arn, auto_detection_metric_source)
+    detect_metric_set_config(anomaly_detector_arn, auto_detection_metric_source, params::Dict{String,<:Any})
+
+Detects an Amazon S3 dataset's file format, interval, and offset.
+
+# Arguments
+- `anomaly_detector_arn`: An anomaly detector ARN.
+- `auto_detection_metric_source`: A data source.
+
+"""
+function detect_metric_set_config(
+    AnomalyDetectorArn,
+    AutoDetectionMetricSource;
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return lookoutmetrics(
+        "POST",
+        "/DetectMetricSetConfig",
+        Dict{String,Any}(
+            "AnomalyDetectorArn" => AnomalyDetectorArn,
+            "AutoDetectionMetricSource" => AutoDetectionMetricSource,
+        );
+        aws_config=aws_config,
+        feature_set=SERVICE_FEATURE_SET,
+    )
+end
+function detect_metric_set_config(
+    AnomalyDetectorArn,
+    AutoDetectionMetricSource,
+    params::AbstractDict{String};
+    aws_config::AbstractAWSConfig=global_aws_config(),
+)
+    return lookoutmetrics(
+        "POST",
+        "/DetectMetricSetConfig",
+        Dict{String,Any}(
+            mergewith(
+                _merge,
+                Dict{String,Any}(
+                    "AnomalyDetectorArn" => AnomalyDetectorArn,
+                    "AutoDetectionMetricSource" => AutoDetectionMetricSource,
+                ),
+                params,
+            ),
         );
         aws_config=aws_config,
         feature_set=SERVICE_FEATURE_SET,

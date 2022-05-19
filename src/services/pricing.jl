@@ -42,7 +42,7 @@ end
     get_attribute_values(attribute_name, service_code)
     get_attribute_values(attribute_name, service_code, params::Dict{String,<:Any})
 
-Returns a list of attribute values. Attibutes are similar to the details in a Price List
+Returns a list of attribute values. Attributes are similar to the details in a Price List
 API offer file. For a list of available attributes, see Offer File Definitions in the
 Amazon Web Services Billing and Cost Management User Guide.
 
